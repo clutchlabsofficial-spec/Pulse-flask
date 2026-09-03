@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ assistant_name }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='jarvis.css') }}">
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="reactor" id="reactor" aria-hidden="true"></span>
+    <span class="brand-name">{{ assistant_name }}</span>
+  </div>
+  <div class="indicators" id="indicators">
+    <span class="chip" data-key="brain">brain</span>
+    <span class="chip" data-key="memory">memory</span>
+    <span class="chip" data-key="voice">voice</span>
+  </div>
+  <div class="controls">
+    <label class="toggle"><input type="checkbox" id="autosend" checked><span>auto-send dictation</span></label>
+    <label class="toggle"><input type="checkbox" id="speech" {% if speech_enabled %}checked{% endif %}><span>voice</span></label>
+    <button id="reset" class="ghost" type="button">reset</button>
+  </div>
+</header>
+
+<main id="log" class="log" aria-live="polite">
+  <div class="boot">
+    <p class="boot-line">{{ assistant_name }} online. Obsidian memory mounted, Fish Audio voice standing by.</p>
+    <p class="boot-hint">Press your Wispr&nbsp;Flow hotkey and speak, or type below. Good {{ greeting }}, {{ user_name }}.</p>
+  </div>
+</main>
+
+<form id="composer" class="composer" autocomplete="off">
+  <div class="mic" id="mic" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+  <textarea id="input" rows="1" placeholder="Dictate with Wispr Flow, or type…" autofocus></textarea>
+  <button type="submit" id="send" aria-label="Send">→</button>
+</form>
+
+<audio id="player" preload="none"></audio>
+<script>window.JARVIS = {name: {{ assistant_name|tojson }}, user: {{ user_name|tojson }}};</script>
+<script src="{{ url_for('static', filename='jarvis.js') }}"></script>
+</body>
+</html>

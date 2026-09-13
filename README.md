@@ -1,7 +1,7 @@
 # PULSE Flask — product website
 
 Single-page site for **PULSE Flask**, a smart water bottle for athletes and
-hikers. Built for the CoCreate Pitch 2026 (London) application.
+hikers, in three sizes. Built for the CoCreate Pitch 2026 (London) application.
 
 Static HTML, CSS and JavaScript. No framework, no build step, no dependencies.
 
@@ -9,8 +9,7 @@ Static HTML, CSS and JavaScript. No framework, no build step, no dependencies.
 
 Open `index.html` in a browser — that's it.
 
-If you'd rather serve it (so the fonts and relative paths behave exactly as
-they would in production):
+To serve it (so fonts and relative paths behave as they would in production):
 
 ```bash
 python3 -m http.server 8000
@@ -21,134 +20,153 @@ python3 -m http.server 8000
 
 | File | What's in it |
 |---|---|
-| `index.html` | All nine sections, commented section by section |
-| `styles.css` | Design tokens, layout, responsive rules |
-| `script.js` | Nav, scroll reveal, feature panels, waitlist form, scroll effects |
+| `index.html` | All twelve sections, commented section by section |
+| `styles.css` | Palette tokens, layout, responsive rules |
+| `script.js` | Nav, showcase mechanic, FAQ, waitlist form, scroll effects |
 | `apps-script/Code.gs` | Waitlist backend — paste into Google Apps Script |
 
-## Feature panels
+## Design
 
-Each of the six feature cards opens to a longer explanation, a detail photo
-slot and a spec list. They're plain `<button>` + panel disclosures, so keyboard
-and screen-reader support come from the markup rather than from JavaScript.
-One opens at a time, and the open one is linkable — `index.html#btn-uvc` loads
-with the UV-C panel already open.
+Black, white and red. Structure is carried entirely by black, dark-grey, white
+and light-grey. **Red is a signal colour only** — the primary CTA, hover
+states, the LED ring, and active-heating references. It is never a large
+background block. Light mode is the default; the hero, founder and footer
+sections invert to black.
 
-## Swapping in real photography
+Type is Inter: 800 for headlines at `-0.02em` tracking, 400 for body.
 
-Every image slot is a placeholder `<div class="ph ...">` with a label naming
-the shot it's waiting for. To replace one, swap the whole div for an image:
+### Palette
 
-```html
-<!-- before -->
-<div class="ph ph-hero" role="img" aria-label="Placeholder for the hero product photograph">
-  <span class="ph-label">Product photo · hero<br>bottle, 3/4 view, LED ring lit</span>
-</div>
-
-<!-- after -->
-<img class="ph-hero" src="images/hero.jpg" alt="PULSE Flask, three-quarter view, LED ring lit">
+```css
+--white: #f8f9fa   --light-grey: #dee2e6   --grey:  #6c757d
+--dark-grey: #343a40   --black: #212529    --pulse-red: #d62828
 ```
 
-Keep the `ph-hero` / `ph-wide` / `ph-square` / `ph-portrait` class — it sets
-the aspect ratio so the layout doesn't shift. Write a real `alt` description
-rather than copying the placeholder label.
+Three extra text tokens exist because several of those pairings fall under
+WCAG AA (4.5:1) **as text**, even though they're fine as structure:
 
-There are six placeholders: hero, feature detail, PULSE Point, founder
-portrait, and the aspect-ratio helpers are reused between them.
+| Token | For | Replaces |
+|---|---|---|
+| `--grey-text: #5d656c` | secondary text on light | `--grey` at 4.45 on white |
+| `--grey-text-dark: #adb5bd` | secondary text on dark | `--grey` at 3.29 on black |
+| `--pulse-red-text: #e88787` | red **lettering** on dark | `--pulse-red` at 3.08 on black |
 
-## Things you'll want to edit
+`--pulse-red` itself is unchanged and still the fill for every button and the
+LED ring — white on it measures 4.75. The split is between red-as-fill and
+red-as-text, not a change to the brand colour.
 
-- **Pricing figures** — one table in the `#pricing` section. Landed cost,
-  retail range and margin all live there and nowhere else.
-- **Founder story** — the `<blockquote>` in the `#founder` section.
-- **Social links** — the footer `<ul class="social">`; the `href="#"` values
-  are placeholders.
-- **Colours** — the entire palette is the `:root` block at the top of
-  `styles.css`. Six colours reskin the site. The ink tones are set where they
-  are because they clear WCAG AA contrast against every background they sit
-  on; re-check contrast if you lighten them.
+Every text node on the rendered page was measured against its real composited
+background; nothing ships under its AA threshold.
+
+## The three-layer scroll mechanic
+
+Section 3 moves three layers at different rates:
+
+1. **Background** — grain panel translated at 0.3× scroll speed
+2. **Bottle** — `position: sticky` stage, pinned while the copy scrolls past.
+   The active step is mirrored onto the stage: the caption swaps and the LED
+   ring lights red on the steps where it would genuinely be glowing.
+3. **Text** — five feature blocks at normal speed, revealed on entry
+
+Two implementation notes worth keeping:
+
+- `.showcase` uses `overflow: clip`, **not** `overflow: hidden`. `hidden` makes
+  it a scroll container, which silently breaks `position: sticky` on the stage
+  inside it.
+- The active step is chosen by **nearest-to-a-line**, not by an
+  IntersectionObserver band. The steps are tall with large gaps, so two can sit
+  in any band at once — "first visible wins" then lags a step behind and never
+  reaches the last one.
+
+Reveals use native `animation-timeline: view()` where supported, with an
+IntersectionObserver fallback gated behind `CSS.supports()` so exactly one
+mechanism ever runs. Everything is disabled under `prefers-reduced-motion`,
+where all content is visible and the stage still pins.
+
+## The three sizes
+
+| | Compact | Standard · launch | Pro |
+|---|---|---|---|
+| Capacity | 500 ml | 800 ml | 1 L |
+| Heating chamber | 430 ml | 770 ml | 855 ml |
+| Battery | 30 Wh | 54 Wh | 60 Wh |
+| Heater | 120 W | 216 W | 240 W |
+| To 165 °F | ~15 min | ~15 min | ~15 min |
+| Price | $120 | $165 | $190 |
+| Expected range | $95–130 | $140–195 | $155–220 |
+| Landed cost | ~$82 | ~$117 | ~$128 |
+| Gross margin | 32% | 29% | 33% |
+
+All three share the same electronics module, heater design, rocker latch, UV-C
+system and twist-off base; only chamber size, battery and heater wattage scale.
+
+Pricing figures live in **one table** in the `#pricing` section and the variant
+cards in `#variants`. Margin is `(retail − landed) / retail`.
 
 ## Collecting signups (Google Sheet + Gmail)
 
 Out of the box the form validates and confirms but **sends nothing** — the
-address stays in the browser. Do this once and signups start landing in a
-Google Sheet and in your Gmail. It's free, unlimited, and the data is yours.
+address stays in the browser. Do this once and signups land in a Google Sheet
+and in your Gmail. Free, unlimited, and the data is yours.
 
-**1. Make the Sheet**
+1. **Make the Sheet.** Create a new Google Sheet.
+2. **Add the script.** Extensions → Apps Script. Delete the sample code, paste
+   in all of [`apps-script/Code.gs`](apps-script/Code.gs). Save.
+3. **Deploy.** Deploy → New deployment → ⚙ → Web app.
+   Execute as **Me**; Who has access **Anyone**. "Anyone" is required — the
+   site calls this from visitors' browsers, and they aren't logged into your
+   Google account. The endpoint only ever *accepts* an email; it never returns
+   your list. Authorise when prompted (it sends mail as you), clicking through
+   the "unverified app" warning for your own private script.
+4. **Connect it.** Copy the Web app URL (ends in `/exec`) into `script.js`:
 
-Create a new Google Sheet. Name it whatever you like.
+   ```js
+   var WAITLIST_ENDPOINT = "https://script.google.com/macros/s/AKfy..../exec";
+   ```
 
-**2. Add the script**
+   Set `FALLBACK_EMAIL` to a real address while you're there — if the endpoint
+   is ever unreachable the form shows it rather than pretending it worked.
+5. **Check it.** Open the `/exec` URL in a browser; you should see
+   `{"ok":true,"status":"PULSE Flask waitlist endpoint is live"}`.
 
-In that Sheet: **Extensions → Apps Script**. Delete the sample code, then
-paste in the entire contents of [`apps-script/Code.gs`](apps-script/Code.gs).
-Save.
+Notes:
+- **Your email address is never in the repo.** The script mails
+  `Session.getEffectiveUser()` — whoever deployed it.
+- Re-deploy after editing (Deploy → Manage deployments → ✎ → Version: New).
+- Duplicates are ignored; the honeypot is checked server-side too.
 
-**3. Deploy it**
+## Swapping in real photography
 
-**Deploy → New deployment → ⚙ → Web app**, then:
+Every image slot is a `<div class="ph ...">` labelled with the shot it's
+waiting for. Replace the whole div with an image, keeping the aspect-ratio
+class so the layout doesn't shift:
 
-| Setting | Value |
-|---|---|
-| Execute as | **Me** |
-| Who has access | **Anyone** |
-
-"Anyone" is required — the website calls this from visitors' browsers, and
-they aren't logged into your Google account. The endpoint only ever *accepts*
-an email address; it never returns your list.
-
-Click **Deploy**. Google asks you to authorise it (it's sending mail as you) —
-you'll see an "unverified app" warning because it's your own private script:
-**Advanced → Go to … (unsafe)** → Allow.
-
-**4. Connect the site**
-
-Copy the **Web app URL** (it ends in `/exec`) and paste it into `script.js`:
-
-```js
-var WAITLIST_ENDPOINT = "https://script.google.com/macros/s/AKfy..../exec";
+```html
+<img class="ph-hero" src="images/hero.jpg" alt="PULSE Flask, three-quarter view, LED ring lit">
 ```
 
-While you're there, set `FALLBACK_EMAIL` to a real address. If the endpoint is
-ever unreachable, the form shows it rather than pretending the signup worked.
-
-**5. Check it**
-
-Paste the `/exec` URL straight into a browser — you should see
-`{"ok":true,"status":"PULSE Flask waitlist endpoint is live"}`. Then submit
-the form on the site and watch the row appear in the Sheet.
-
-### Notes
-
-- **Your email address is never in the repo.** The script mails
-  `Session.getEffectiveUser()`, which is whoever deployed it — you.
-- Re-deploy after editing the script (**Deploy → Manage deployments → ✎ →
-  Version: New**), or the old code keeps running.
-- Duplicate addresses are ignored, so a double-tap doesn't make two rows.
-- The honeypot field is checked on the server too, not just in the browser.
-- Set `SEND_NOTIFICATIONS = false` in `Code.gs` if you want rows without email.
+Write a real `alt` description rather than copying the placeholder label. The
+showcase stage (`.stage-frame`) takes a photo per step — the captions come from
+`data-caption` on each `.showcase-step`.
 
 ## Specs still to fill in
 
-The feature panels contain `[SPEC: …]` placeholders wherever a real measured
-number belongs. **These are deliberately blank rather than guessed** — this
-page is going in front of judges, so nothing should claim a figure that hasn't
-been tested. Search the project for `[SPEC:` to find them all:
+Search for `[SPEC:` — these are deliberately blank rather than guessed, because
+this page goes in front of judges:
 
-| Feature | Needs |
-|---|---|
-| Tap-to-glow LED ring | Seconds lit before fade; temperature range |
-| Rotating bezel | Number of detent positions |
-| Magnetic charging | Charge time; battery life; IP rating |
-| Rocker latch spout | Tested open/close cycle count |
-| UV-C purification | Cycle time; wavelength; lab results |
-| Boost Mode | °C rise; run time; battery cost per boost |
+- UV-C wavelength and independent lab results
+- Rocker latch tested open/close cycle count
+- IP water rating
+- Battery life in days of typical use
+
+## Other things to edit
+
+- **Social links** — footer `<ul class="social">`, currently `href="#"`.
+- **Colours** — the `:root` block at the top of `styles.css`. Re-check contrast
+  if you lighten any text token.
 
 ## Notes
 
 - Mobile-first; verified at 320, 375, 768 and 1280px with no horizontal scroll.
-- Respects `prefers-reduced-motion` — all animation is disabled and nothing
-  is hidden.
-- Fonts load from Google Fonts with a full system-font fallback, so the page
-  still renders correctly offline.
 - Nothing on the site is presented as available to buy.
+- The category comparison names no competitor and invents no competitor spec.

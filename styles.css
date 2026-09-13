@@ -1,74 +1,79 @@
 /* ==========================================================================
    PULSE Flask — stylesheet
    --------------------------------------------------------------------------
-   Design direction: premium athletic. Muted, desaturated, warm neutrals.
-   The page is built on HAIRLINES AND WHITESPACE, not cards and drop shadows.
-   There is deliberately not a single box-shadow on a content block.
+   Direction: black / white / red. Structure is carried entirely by
+   black, dark-grey, white and light-grey. RED IS A SIGNAL ONLY — the primary
+   CTA, hover states, and anything referencing the LED ring or active heating.
+   It is never a large background block.
+
+   Light mode is the default (white/light-grey grounds, black text). The hero,
+   founder and footer sections invert to black for contrast.
 
    Contents
      1. Tokens
      2. Reset & base
      3. Typography helpers
-     4. Layout (wrap, sections)
+     4. Layout
      5. Buttons
-     6. Photo placeholders
+     6. Placeholders
      7. Header & nav
-     8. Hero
+     8. Hero (inverted)
      9. Problem
-    10. Features
-    11. PULSE Point
-    12. Editions
-    13. Founder
-    14. Pricing ledger
-    15. Waitlist form
-    16. Footer
-    17. Scroll reveal & reduced motion
+    10. Sticky showcase — the three-layer scroll mechanic
+    11. Variants
+    12. Category comparison
+    13. PULSE Point
+    14. Editions
+    15. Founder (inverted)
+    16. Pricing
+    17. FAQ
+    18. Waitlist
+    19. Footer (inverted)
+    20. Scroll reveal & reduced motion
    ========================================================================== */
 
 
-/* 1. TOKENS ================================================================
-   The whole palette is here. Change these six colours and the site reskins. */
+/* 1. TOKENS ================================================================ */
 
 :root {
-  /* Surfaces — warm bone, not blue-white. This is what keeps it off "tech". */
-  --ground:      #f4f2ed;
-  --surface:     #eae7e0;
-  --surface-2:   #e2ded5;
+  /* The requested palette, verbatim. */
+  --white:        #f8f9fa;
+  --light-grey:   #dee2e6;
+  --grey:         #6c757d;
+  --dark-grey:    #343a40;
+  --black:        #212529;
+  --pulse-red:    #d62828;
 
-  /* Ink. All three tones clear WCAG AA (4.5:1) against every surface they
-     sit on — checked against --ground, --surface AND --surface-2. Muted
-     greys this desaturated get illegible fast, so don't lighten them
-     without re-checking contrast. */
-  --ink:         #1c1f1e;   /* near-black slate, never pure #000 */
-  --ink-muted:   #55594f;   /* body secondary — 6.4:1 on ground */
-  --ink-faint:   #61635c;   /* labels, eyebrows, fine print — 4.5:1 on surface-2 */
+  /* --- Derived text tokens ------------------------------------------------
+     Measured against WCAG AA (4.5:1), several of the palette pairings fall
+     short as TEXT. The palette above is untouched; these three exist so no
+     text on the page ships under 4.5:1.
 
-  /* Accent — desaturated moss. Used for CTAs and active states only. */
-  --accent:      #59654f;
-  --accent-deep: #454f3d;
+       --grey on --white        4.45  (just under)
+       --grey on --black        3.29
+       --pulse-red on --black   3.08
+       --pulse-red on --dark-grey 2.30
 
-  /* Secondary — muted clay. Used twice on the whole page, on purpose. */
-  --clay:        #8f5b42;
-
-  /* Hairlines */
-  --line:        #d6d2c9;
-  --line-strong: #c3bdb1;
+     The fix separates red-as-fill from red-as-text. --pulse-red is still the
+     button and LED colour everywhere; only red *lettering* on a dark ground
+     swaps to the lighter tint. */
+  --grey-text:        #5d656c;   /* secondary text on light — 5.62 / 4.55 */
+  --grey-text-dark:   #adb5bd;   /* secondary text on dark  — 9.5 / 7.2   */
+  --pulse-red-text:   #e88787;   /* red TEXT on dark        — 6.06 / 4.52 */
+  --pulse-red-deep:   #b81e1e;   /* button hover */
 
   /* Type */
-  --font-display: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont,
-                  "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-body:    "Inter", -apple-system, BlinkMacSystemFont,
-                  "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono:    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-                  "Liberation Mono", monospace;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+               "Liberation Mono", monospace;
 
   /* Rhythm */
-  --section-y:  clamp(4.5rem, 10vw, 9rem);
-  --gutter:     clamp(1.25rem, 5vw, 2.5rem);
-  --maxw:       1140px;
-  --maxw-narrow: 720px;
-
-  --radius: 3px;   /* almost square — softer reads as "toy" */
+  --section-y:   clamp(4.5rem, 10vw, 9rem);
+  --gutter:      clamp(1.25rem, 5vw, 2.5rem);
+  --maxw:        1180px;
+  --maxw-narrow: 740px;
+  --radius:      4px;
 }
 
 
@@ -79,53 +84,45 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Anchors shouldn't land under the sticky header. */
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 5rem;   /* anchors clear the sticky header */
 }
 
 body {
   margin: 0;
-  background: var(--ground);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.65;
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  /* Belt and braces against any single element causing sideways scroll. */
   overflow-x: hidden;
 }
 
 img { max-width: 100%; height: auto; display: block; }
 
 h1, h2, h3 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;   /* tight tracking is most of the "premium" read */
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
   margin: 0 0 0.6em;
   text-wrap: balance;
 }
 
-h1 { font-size: clamp(2.4rem, 7vw, 4.4rem); letter-spacing: -0.035em; }
-h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); }
-h3 { font-size: clamp(1.05rem, 2vw, 1.2rem); letter-spacing: -0.01em; }
-
-/* Used where a section must sit visually below the main h2s (PULSE Point,
-   founder) while keeping a correct document outline. */
-.h3-scale { font-size: clamp(1.4rem, 3vw, 1.9rem); }
+h1 { font-size: clamp(2.5rem, 9vw, 5.5rem); letter-spacing: -0.03em; }
+h2 { font-size: clamp(1.85rem, 4.5vw, 3.1rem); }
+h3 { font-size: clamp(1.1rem, 2vw, 1.3rem); font-weight: 700; letter-spacing: -0.01em; }
 
 p { margin: 0 0 1.1em; }
 p:last-child { margin-bottom: 0; }
-
 a { color: inherit; }
 
-/* Accessibility: a visible, high-contrast focus ring everywhere. */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--pulse-red);
   outline-offset: 3px;
   border-radius: 2px;
 }
+/* On dark grounds the deep red ring is too low-contrast to see. */
+.is-inverted :focus-visible { outline-color: var(--pulse-red-text); }
 
 .visually-hidden {
   position: absolute;
@@ -139,11 +136,10 @@ a { color: inherit; }
 
 .skip-link {
   position: absolute;
-  left: -9999px;
-  top: 0;
+  left: -9999px; top: 0;
   z-index: 100;
-  background: var(--ink);
-  color: var(--ground);
+  background: var(--pulse-red);
+  color: #fff;
   padding: 0.75rem 1.25rem;
   text-decoration: none;
 }
@@ -152,38 +148,37 @@ a { color: inherit; }
 
 /* 3. TYPOGRAPHY HELPERS ==================================================== */
 
-/* Small uppercase mono label that opens most sections. */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--grey-text);
   margin: 0 0 1.25rem;
 }
+.is-inverted .eyebrow { color: var(--pulse-red-text); }
 
 .lead {
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.6;
-  color: var(--ink-muted);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.55;
+  color: var(--grey-text);
   max-width: 34em;
 }
+.is-inverted .lead { color: var(--grey-text-dark); }
 
 .section-lead {
-  font-size: clamp(1rem, 1.6vw, 1.1rem);
-  color: var(--ink-muted);
-  max-width: 46ch;
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  color: var(--grey-text);
+  max-width: 48ch;
 }
+.is-inverted .section-lead { color: var(--grey-text-dark); }
 
-.fine {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--ink-faint);
-}
-.fine-inline { color: var(--ink-faint); font-weight: 400; }
+.fine { font-size: 0.85rem; line-height: 1.6; color: var(--grey-text); }
+.is-inverted .fine { color: var(--grey-text-dark); }
 
-/* The one clay-coloured element in the features grid. */
-.tag-clay { color: var(--clay); }
+/* Red lettering. Picks the safe tint automatically on inverted sections. */
+.hot { color: var(--pulse-red); }
+.is-inverted .hot { color: var(--pulse-red-text); }
 
 
 /* 4. LAYOUT ================================================================ */
@@ -194,24 +189,21 @@ a { color: inherit; }
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
-/* Narrow sections keep the SAME left rule as full-width ones — only the
-   measure is constrained, not the column position. Centring the narrow
-   column instead would make the page's left edge visibly jump section
-   to section. */
+/* Narrow sections keep the same left rule as full-width ones — only the
+   measure is constrained, never the column position. */
 .wrap-narrow > * { max-width: var(--maxw-narrow); }
 
 .section { padding-block: var(--section-y); }
-
-/* Alternating band. Uses surface, plus hairlines to define the edges. */
-.section-alt {
-  background: var(--surface);
-  border-block: 1px solid var(--line);
-}
-
-/* PULSE Point sits tighter than a full section — it's a companion product. */
+.section-alt { background: var(--light-grey); }
 .section-tight { padding-block: clamp(3.5rem, 7vw, 6rem); }
-
 .section-head { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+
+/* The inverted bands: hero, founder, footer. */
+.is-inverted {
+  background: var(--black);
+  color: var(--white);
+}
+.is-inverted h2, .is-inverted h3 { color: var(--white); }
 
 
 /* 5. BUTTONS =============================================================== */
@@ -220,44 +212,46 @@ a { color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  background: var(--accent);
-  color: #f7f6f2;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  background: var(--pulse-red);
+  color: #fff;                  /* 4.75:1 on --pulse-red */
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
   text-decoration: none;
-  padding: 0.9rem 1.6rem;
-  min-height: 44px;            /* touch target */
-  border: 1px solid var(--accent);
+  padding: 1rem 1.9rem;
+  min-height: 48px;
+  border: 1px solid var(--pulse-red);
   border-radius: var(--radius);
   cursor: pointer;
   transition: background-color 0.18s ease, border-color 0.18s ease;
 }
-.btn:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+.btn:hover { background: var(--pulse-red-deep); border-color: var(--pulse-red-deep); }
+.btn-lg { padding: 1.15rem 2.3rem; font-size: 1.05rem; }
+.btn-sm { padding: 0.6rem 1.15rem; font-size: 0.85rem; min-height: 40px; }
+.btn[disabled] { opacity: 0.65; cursor: default; }
 
-.btn-lg { padding: 1.05rem 2rem; font-size: 1rem; }
-.btn-sm { padding: 0.6rem 1.1rem; font-size: 0.85rem; min-height: 40px; }
 
-
-/* 6. PHOTO PLACEHOLDERS ====================================================
-   Styled to look like intentional design comps, never like broken images.
-   Replace each .ph div with an <img> when real photography arrives. */
+/* 6. PLACEHOLDERS ==========================================================
+   Styled as intentional comps, never as broken images. Replace each with an
+   <img> carrying the same aspect-ratio class so the layout doesn't shift. */
 
 .ph {
   display: grid;
   place-items: center;
-  background: var(--surface-2);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
   padding: 1.5rem;
-  /* Faint diagonal hatch so it clearly reads as "placeholder", quietly. */
+  background: var(--light-grey);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius);
   background-image: repeating-linear-gradient(
-    45deg,
-    transparent 0 10px,
-    rgba(28, 31, 30, 0.022) 10px 20px
-  );
+    45deg, transparent 0 10px, rgba(33, 37, 41, 0.03) 10px 20px);
+}
+.is-inverted .ph,
+.showcase .ph {
+  background: var(--dark-grey);
+  border-color: var(--grey);
+  background-image: repeating-linear-gradient(
+    45deg, transparent 0 10px, rgba(248, 249, 250, 0.04) 10px 20px);
 }
 
 .ph-label {
@@ -267,13 +261,14 @@ a { color: inherit; }
   text-transform: uppercase;
   line-height: 1.8;
   text-align: center;
-  color: var(--ink-faint);
+  color: var(--grey-text);
 }
+.is-inverted .ph-label,
+.showcase .ph-label { color: var(--grey-text-dark); }
 
-.ph-hero    { aspect-ratio: 4 / 3; }
-.ph-wide    { aspect-ratio: 16 / 9; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
-.ph-square  { aspect-ratio: 1 / 1; }
-.ph-portrait{ aspect-ratio: 4 / 5; }
+.ph-hero     { aspect-ratio: 4 / 3; }
+.ph-square   { aspect-ratio: 1 / 1; }
+.ph-portrait { aspect-ratio: 4 / 5; }
 
 
 /* 7. HEADER & NAV ========================================================== */
@@ -282,10 +277,11 @@ a { color: inherit; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(244, 242, 237, 0.88);
+  background: rgba(33, 37, 41, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
+  color: var(--white);
+  border-bottom: 1px solid var(--dark-grey);
 }
 
 .header-inner {
@@ -296,59 +292,40 @@ a { color: inherit; }
   min-height: 4rem;
 }
 
-/* Reading progress, pinned to the bottom edge of the sticky header. */
-.progress {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;      /* sits on the header's own bottom hairline */
-  height: 2px;
-}
-.progress-bar {
-  display: block;
-  width: 0;
-  height: 100%;
-  background: var(--accent);
-  transform-origin: left center;
-}
-
 .wordmark {
-  font-family: var(--font-display);
   font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
   margin: 0;
+  color: var(--white);
 }
-.wordmark-light { font-weight: 400; color: var(--ink-muted); letter-spacing: 0.04em; }
+.wordmark-light { font-weight: 400; color: var(--grey-text-dark); letter-spacing: 0.05em; }
 
-/* Mobile-first: nav is hidden behind the toggle by default. */
+/* Mobile-first: nav hidden behind the toggle. */
 .site-nav {
   display: none;
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  top: 100%; left: 0; right: 0;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0;
   padding: 0.5rem var(--gutter) 1.25rem;
-  background: var(--ground);
-  border-bottom: 1px solid var(--line);
+  background: var(--black);
+  border-bottom: 1px solid var(--dark-grey);
 }
 .site-nav.is-open { display: flex; }
 
-.site-nav a {
+/* :not(.btn) matters — a bare `.site-nav a` is specificity 0,1,1 and would
+   silently zero out the CTA's own padding, crushing the button. */
+.site-nav a:not(.btn) {
   font-size: 0.95rem;
   text-decoration: none;
-  color: var(--ink-muted);
+  color: var(--grey-text-dark);
   padding: 0.75rem 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--dark-grey);
 }
-.site-nav a:hover { color: var(--ink); }
-.site-nav .btn { color: #f7f6f2; border-bottom: 1px solid var(--accent); margin-top: 1rem; }
-.site-nav .btn:hover { color: #f7f6f2; }
+.site-nav a:not(.btn):hover { color: var(--white); }
+.site-nav .btn { margin-top: 1rem; }
 
 .nav-toggle {
   display: inline-flex;
@@ -359,65 +336,69 @@ a { color: inherit; }
   background: none;
   border: 0;
   cursor: pointer;
-  color: var(--ink);
+  color: var(--white);
 }
 .nav-toggle-bars { display: block; width: 20px; }
 .nav-toggle-bars span {
   display: block;
-  height: 1.5px;
+  height: 2px;
   background: currentColor;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 .nav-toggle-bars span + span { margin-top: 5px; }
-
-/* Toggle morphs into an X when the menu is open. */
 .nav-toggle[aria-expanded="true"] .nav-toggle-bars span:first-child {
-  transform: translateY(3.25px) rotate(45deg);
+  transform: translateY(3.5px) rotate(45deg);
 }
 .nav-toggle[aria-expanded="true"] .nav-toggle-bars span:last-child {
-  transform: translateY(-3.25px) rotate(-45deg);
+  transform: translateY(-3.5px) rotate(-45deg);
 }
 
-@media (min-width: 720px) {
+/* Reading progress, pinned to the header's bottom edge. */
+.progress {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+}
+.progress-bar {
+  display: block;
+  width: 0; height: 100%;
+  background: var(--pulse-red);
+}
+
+@media (min-width: 800px) {
   .nav-toggle { display: none; }
   .site-nav {
     display: flex;
     position: static;
     flex-direction: row;
     align-items: center;
-    gap: 2rem;
+    gap: 1.6rem;
     padding: 0;
     background: none;
     border: 0;
   }
-  .site-nav a { padding: 0; border-bottom: 0; }
-  .site-nav .btn { margin-top: 0; border: 1px solid var(--accent); }
+  .site-nav a:not(.btn) { padding: 0; border-bottom: 0; }
+  .site-nav .btn { margin-top: 0; }
 
-  /* Scrollspy: marks the section currently in view. Only on desktop, where
-     the nav is actually visible. Underlined as well as recoloured, so the
-     state doesn't rely on colour alone. */
   .site-nav a[aria-current="true"] {
-    color: var(--accent);
+    color: var(--pulse-red-text);
     text-decoration: underline;
     text-underline-offset: 5px;
-    text-decoration-thickness: 1.5px;
+    text-decoration-thickness: 2px;
   }
-  .site-nav .btn[aria-current="true"] { text-decoration: none; }
+  .site-nav .btn[aria-current="true"] { text-decoration: none; color: #fff; }
 }
 
 
 /* 8. HERO ================================================================== */
 
-.hero {
-  padding-block: clamp(3.5rem, 9vw, 7rem) var(--section-y);
-}
+.hero { padding-block: clamp(4rem, 11vw, 8.5rem) var(--section-y); }
 .hero .wrap { display: grid; gap: clamp(2.5rem, 6vw, 4rem); }
-
-.hero-copy .btn { margin-top: 1.75rem; }
+.hero-copy .btn { margin-top: 2rem; }
 
 @media (min-width: 960px) {
   .hero .wrap {
-    grid-template-columns: 1.05fr 1fr;
+    grid-template-columns: 1.1fr 1fr;
     align-items: center;
     gap: 4rem;
   }
@@ -430,195 +411,312 @@ a { color: inherit; }
   list-style: none;
   margin: clamp(2.5rem, 5vw, 3.5rem) 0 0;
   padding: 0;
-  border-top: 1px solid var(--line);
+  border-top: 2px solid var(--black);
 }
-
 .problem-item {
   display: grid;
   grid-template-columns: 2.5rem 1fr;
   gap: 0 1rem;
   padding: 1.75rem 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--light-grey);
 }
-
 .problem-index {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.1em;
-  color: var(--ink-faint);
+  color: var(--pulse-red);
   padding-top: 0.35rem;
+  font-weight: 600;
 }
-
 .problem-item h3 { margin-bottom: 0.4rem; }
-.problem-item p { color: var(--ink-muted); margin: 0; max-width: 56ch; }
+.problem-item p { color: var(--grey-text); margin: 0; max-width: 58ch; }
 
 
-/* 10. FEATURES ============================================================= */
+/* 10. STICKY SHOWCASE — the three-layer scroll mechanic ====================
+   Layer 1  .showcase-bg     flat/grain panel, translated at 0.3x by JS
+   Layer 2  .showcase-stage  position:sticky, pinned while text scrolls
+   Layer 3  .showcase-step   normal scroll speed, revealed on entry
+   ========================================================================== */
 
-.feature-grid {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.showcase {
+  position: relative;
+  background: var(--black);
+  color: var(--white);
+  /* clip, NOT hidden. `overflow: hidden` makes this a scroll container,
+     which silently stops `position: sticky` working on .showcase-stage
+     inside it — the stage just scrolls away. `clip` contains the over-tall
+     parallax panel without creating a scroll container. */
+  overflow: clip;
+}
+
+/* Layer 1. Taller than the section so it can travel without exposing an
+   edge. JS writes translate3d here; with JS off it simply sits still. */
+.showcase-bg {
+  position: absolute;
+  top: -20%; left: 0;
+  width: 100%; height: 140%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(214, 40, 40, 0.10), transparent 60%),
+    repeating-linear-gradient(45deg, transparent 0 12px, rgba(248,249,250,0.018) 12px 24px),
+    var(--black);
+  will-change: transform;
+}
+
+.showcase > .wrap { position: relative; z-index: 1; }
+
+.showcase-inner { display: grid; gap: 2.5rem; }
+
+/* Layer 2 */
+.showcase-stage { position: relative; }
+
+.stage-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  /* The stage must fit between the sticky header and the bottom of the
+     viewport, or it gets pushed out of its own sticky position on the last
+     step. Capping the height is what keeps it pinned the whole way down. */
+  max-height: calc(100vh - 13rem);
   display: grid;
-  gap: 0;
-  /* Hairline grid: each cell draws its own top rule. */
-  border-top: 1px solid var(--line-strong);
+  place-items: center;
+  background: var(--dark-grey);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
-.feature {
-  padding: 2rem 0;
-  border-bottom: 1px solid var(--line-strong);
-}
-
-.feature-index {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  color: var(--ink-faint);
-  margin-bottom: 0.9rem;
-}
-
-.feature h3 { margin-bottom: 0.5rem; }
-.feature p { color: var(--ink-muted); margin: 0; max-width: 42ch; }
-
-/* Prompt that the cards are interactive — without it people don't discover
-   the panels. Sits above the grid, quiet. */
-.grid-hint {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin: 0 0 1rem;
-}
-
-/* --- Feature disclosure -------------------------------------------------
-   The header is a real <button>, so it's reset back to looking like content
-   rather than a control. The affordance is the "How it works +" row. */
-
-.feature-btn {
-  display: block;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.feature-btn h3 { transition: color 0.18s ease; }
-.feature-btn:hover h3 { color: var(--accent); }
-
-/* "How it works" + the open/close sign. */
-.feature-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
+.stage-caption {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  text-align: center;
+  line-height: 1.9;
+  color: var(--grey-text-dark);
+  padding: 1.5rem;
+  /* script.js writes the caption with textContent (not innerHTML, which
+     would be an injection hole for data-* content), so the line break
+     arrives as a newline and needs pre-line to render. */
+  white-space: pre-line;
 }
 
-/* Drawn with pseudo-elements so it animates as a + turning into a −. */
-.feature-sign {
-  position: relative;
-  width: 11px;
-  height: 11px;
-  flex: none;
-}
-.feature-sign::before,
-.feature-sign::after {
-  content: "";
+/* The LED ring — the single most literal use of red on the page. Off by
+   default; JS adds .is-lit when the active step is one where the ring would
+   actually be glowing (tap-to-glow, active heating). */
+.stage-led {
   position: absolute;
-  inset: 50% 0 auto 0;
-  height: 1.5px;
-  background: currentColor;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid var(--grey);
+  opacity: 0.35;
+  transition: opacity 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
-.feature-sign::after { transform: rotate(90deg); }
-
-.feature-btn[aria-expanded="true"] .feature-sign::after {
-  transform: rotate(0deg);
-  opacity: 0;
+.stage-led.is-lit {
+  border-color: var(--pulse-red);
+  opacity: 1;
+  box-shadow:
+    0 0 24px 2px rgba(214, 40, 40, 0.55),
+    inset 0 0 18px rgba(214, 40, 40, 0.35);
 }
 
-/* The panel animates on grid-template-rows, which transitions cleanly from
-   nothing to auto height without measuring scrollHeight in JS. The inner
-   element needs its own overflow:hidden for the 0fr row to actually clip. */
-.feature-panel {
+/* Step counter above the frame. */
+.stage-count {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: var(--grey-text-dark);
+  margin-bottom: 0.9rem;
+}
+.stage-count b { color: var(--pulse-red-text); font-weight: 600; }
+
+/* Layer 3 */
+.showcase-steps {
+  list-style: none;
+  margin: 0; padding: 0;
   display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.32s ease;
+  gap: clamp(3rem, 10vh, 6rem);
 }
-.feature-panel.is-open { grid-template-rows: 1fr; }
-
-.feature-panel-inner {
-  overflow: hidden;
-  min-height: 0;
+.showcase-step {
+  border-top: 1px solid var(--grey);
+  padding-top: 1.5rem;
+  transition: opacity 0.35s ease;
 }
-
-/* Padding lives on a child of the clipped element, or it would show at 0fr. */
-.feature-panel.is-open .feature-panel-inner { padding-top: 1.5rem; }
-
-.feature-panel p {
-  color: var(--ink-muted);
-  max-width: 46ch;
-  margin-bottom: 1em;
-}
-
-.ph-panel {
-  aspect-ratio: 3 / 2;
-  margin: 1.25rem 0;
+.showcase-step h3 { margin-bottom: 0.5rem; }
+.showcase-step p { color: var(--grey-text-dark); margin: 0; max-width: 44ch; }
+.showcase-step-index {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--pulse-red-text);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
 }
 
-/* Spec list — mono, hairline-separated rows. */
-.spec {
-  margin: 0;
-  border-top: 1px solid var(--line-strong);
+@media (min-width: 900px) {
+  .showcase-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .showcase-stage {
+    position: sticky;
+    top: 6rem;               /* clears the 4rem sticky header */
+  }
+  /* Run-out: the steps column has to stay taller than the pinned stage all
+     the way to the last step, or sticky releases early and the stage slides
+     away under the header. This bottom padding is that headroom. */
+  .showcase-steps { padding-block: 2rem 12rem; }
+
+  /* Dim the steps that aren't current, so the pinned bottle and the copy
+     read as one linked unit. Never below 4.5:1 — .45 of --grey-text-dark on
+     black still clears it, and the text is also revealed by scroll anyway. */
+  .showcase-step { opacity: 0.45; }
+  .showcase-step.is-current { opacity: 1; }
+}
+
+
+/* 11. VARIANTS ============================================================= */
+
+.variant-grid {
+  list-style: none;
+  margin: clamp(2.5rem, 5vw, 3.5rem) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.variant {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--light-grey);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+}
+.section-alt .variant { border-color: var(--grey); }
+
+/* The launch SKU is the one to look at first. */
+.variant--launch { border: 2px solid var(--pulse-red); }
+
+.variant-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #fff;
+  background: var(--pulse-red);
+  padding: 0.3rem 0.6rem;
+  border-radius: 100px;
+  margin-bottom: 0.9rem;
+}
+.variant-spacer { height: calc(0.62rem * 1.6 + 0.6rem + 0.9rem); }
+
+.variant h3 { margin-bottom: 0.15rem; }
+.variant-size {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  line-height: 1.5;
+  letter-spacing: 0.1em;
+  color: var(--grey-text);
+  margin-bottom: 1.1rem;
 }
-.spec > div {
-  display: grid;
-  grid-template-columns: 8.5rem 1fr;
+.variant-price {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.2rem;
+}
+.variant-range { font-size: 0.82rem; color: var(--grey-text); margin-bottom: 1.25rem; }
+
+.variant-spec {
+  margin: 0;
+  border-top: 1px solid var(--light-grey);
+  font-size: 0.85rem;
+}
+.section-alt .variant-spec { border-top-color: var(--grey); }
+.variant-spec > div {
+  display: flex;
+  justify-content: space-between;
   gap: 1rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--light-grey);
 }
-.spec dt {
-  letter-spacing: 0.08em;
+.section-alt .variant-spec > div { border-bottom-color: rgba(108, 117, 125, 0.35); }
+.variant-spec dt { color: var(--grey-text); }
+.variant-spec dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.platform-note { margin-top: 1.75rem; }
+
+@media (min-width: 760px) {
+  .variant-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+
+/* 12. CATEGORY COMPARISON ================================================== */
+
+.compare-wrap {
+  overflow-x: auto;                 /* scrolls itself, never the page */
+  margin-top: clamp(2rem, 4vw, 3rem);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius);
+}
+.compare {
+  width: 100%;
+  min-width: 36rem;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background: var(--white);
+}
+.compare th, .compare td {
+  text-align: left;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 1px solid var(--light-grey);
+  vertical-align: top;
+}
+.compare thead th {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  font-weight: 600;
+  color: var(--white);
+  background: var(--black);
+  border-bottom: 0;
 }
-.spec dd { margin: 0; color: var(--ink-muted); }
+.compare tbody th { font-weight: 600; }
+.compare td { color: var(--grey-text); }
+.compare .col-pulse { background: var(--light-grey); color: var(--black); }
 
-@media (max-width: 400px) {
-  .spec > div { grid-template-columns: 1fr; gap: 0.15rem; }
+/* Specificity note: `.compare .col-pulse` above is 0,2,0 and outranks
+   `.compare thead th` (0,1,2), so without this the header cell loses its
+   black ground and renders light red on light grey at 1.96:1. Matching
+   th.col-pulse (0,2,1) puts the dark ground back. */
+.compare thead th.col-pulse {
+  background: var(--black);
+  color: var(--pulse-red-text);
 }
-
-@media (min-width: 640px) {
-  .feature-grid { grid-template-columns: repeat(2, 1fr); column-gap: 2.5rem; }
-}
-
-@media (min-width: 960px) {
-  .feature-grid { grid-template-columns: repeat(3, 1fr); column-gap: 3rem; }
-}
+.compare tr:last-child th, .compare tr:last-child td { border-bottom: 0; }
+.compare-note { margin-top: 1rem; }
 
 
-/* 11. PULSE POINT ==========================================================
-   Intentionally quieter than the main product sections. */
+/* 13. PULSE POINT ========================================================== */
 
 .pp-inner { display: grid; gap: 2rem; align-items: center; }
-
-.pp-copy p { color: var(--ink-muted); max-width: 46ch; }
+.pp-copy p { color: var(--grey-text); max-width: 46ch; }
 .pp-copy .fine { margin-top: 1.1rem; }
 
 @media (min-width: 720px) {
@@ -626,36 +724,30 @@ a { color: inherit; }
 }
 
 
-/* 12. EDITIONS ============================================================= */
+/* 14. EDITIONS ============================================================= */
 
 .edition-grid {
   list-style: none;
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   display: grid;
-  gap: 1px;                      /* the gap itself becomes the hairline */
-  background: var(--line-strong);
-  border: 1px solid var(--line-strong);
+  gap: 1px;
+  background: var(--grey);
+  border: 1px solid var(--grey);
   border-radius: var(--radius);
   overflow: hidden;
 }
+.edition { background: var(--white); padding: 1.75rem; }
+.edition h3 { margin: 0.9rem 0 0.4rem; }
+.edition p { color: var(--grey-text); font-size: 0.9rem; margin: 0; }
 
-.edition {
-  background: var(--surface);
-  padding: 1.75rem;
-}
-
-.edition h3 { margin: 0.9rem 0 0.4rem; color: var(--ink-muted); }
-.edition p { color: var(--ink-faint); font-size: 0.9rem; margin: 0; }
-
-/* "Coming after launch" tag — clay, low-key, never a buy signal. */
 .pill {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--clay);
+  font-weight: 600;
+  color: var(--pulse-red);
   border: 1px solid currentColor;
   border-radius: 100px;
   padding: 0.3rem 0.7rem;
@@ -666,117 +758,148 @@ a { color: inherit; }
 }
 
 
-/* 13. FOUNDER ============================================================== */
+/* 15. FOUNDER (inverted) =================================================== */
 
 .founder-inner { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
-
-.founder-copy { max-width: 60ch; }
-
+.founder-copy { max-width: 62ch; }
 .founder-quote {
   margin: 0;
   padding-left: 1.5rem;
-  border-left: 2px solid var(--line-strong);
+  border-left: 3px solid var(--pulse-red);
 }
 .founder-quote p {
-  font-size: clamp(1rem, 1.7vw, 1.1rem);
+  font-size: clamp(1.02rem, 1.7vw, 1.15rem);
   line-height: 1.7;
-  color: var(--ink-muted);
+  color: var(--grey-text-dark);
 }
 
 @media (min-width: 860px) {
-  .founder-inner {
-    grid-template-columns: 320px 1fr;
-    align-items: center;
-    gap: 4rem;
-  }
+  .founder-inner { grid-template-columns: 320px 1fr; align-items: center; gap: 4rem; }
 }
 
 
-/* 14. PRICING LEDGER ======================================================= */
+/* 16. PRICING ============================================================== */
 
 .ledger-wrap {
+  overflow-x: auto;
   margin: clamp(2rem, 4vw, 3rem) 0 1.5rem;
-  overflow-x: auto;             /* never let the table push the page sideways */
+  border: 1px solid var(--grey);
+  border-radius: var(--radius);
 }
-
 .ledger {
   width: 100%;
+  min-width: 32rem;
   border-collapse: collapse;
-  font-family: var(--font-display);
+  background: var(--white);
 }
-
-.ledger th,
-.ledger td {
+.ledger th, .ledger td {
   text-align: left;
-  padding: 1.1rem 0;
-  border-bottom: 1px solid var(--line-strong);
-  font-weight: 400;
-  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--light-grey);
+  font-size: 0.98rem;
 }
-
+.ledger thead th {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--black);
+  border-bottom: 0;
+}
 .ledger .num {
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  font-weight: 500;
-}
-
-/* The margin row is the point of the section, so it gets the emphasis. */
-.ledger-total th,
-.ledger-total td {
-  border-bottom: 0;
-  border-top: 2px solid var(--ink);
-  padding-top: 1.25rem;
-  font-size: clamp(1.05rem, 2vw, 1.3rem);
   font-weight: 600;
-  color: var(--ink);
 }
+.ledger .margin { color: var(--pulse-red); font-weight: 700; }
+.ledger tbody th { font-weight: 600; }
+.ledger tr:last-child th, .ledger tr:last-child td { border-bottom: 0; }
 
 
-/* 15. WAITLIST FORM ======================================================== */
+/* 17. FAQ ================================================================== */
 
-/* The form is narrower than the surrounding prose, but stays on the same
-   left rule as every other section — hence a max-width here rather than on
-   the .wrap element (which is centred, and would drag the form with it). */
-.waitlist-form,
-.waitlist-done { max-width: 620px; }
+.faq {
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+  border-top: 2px solid var(--black);
+}
+.faq-item { border-bottom: 1px solid var(--light-grey); }
 
+.faq-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.35rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.faq-btn h3 { margin: 0; flex: 1; transition: color 0.18s ease; }
+.faq-btn:hover h3 { color: var(--pulse-red); }
+
+/* +/- indicator, drawn with pseudo-elements so it animates. */
+.sign { position: relative; width: 12px; height: 12px; flex: none; color: var(--pulse-red); }
+.sign::before, .sign::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.sign::after { transform: rotate(90deg); }
+[aria-expanded="true"] .sign::after { transform: rotate(0deg); opacity: 0; }
+
+/* grid-template-rows animates cleanly from nothing to auto height without
+   measuring scrollHeight in JS. */
+.faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s ease;
+}
+.faq-panel.is-open { grid-template-rows: 1fr; }
+.faq-panel-inner { overflow: hidden; min-height: 0; }
+.faq-panel.is-open .faq-panel-inner { padding-bottom: 1.4rem; }
+.faq-panel p { color: var(--grey-text); max-width: 64ch; }
+
+
+/* 18. WAITLIST ============================================================= */
+
+.waitlist-form, .waitlist-done { max-width: 620px; }
 .waitlist-form { margin-top: 2rem; }
 
 .field { display: grid; gap: 0.75rem; }
-
 .field input[type="email"] {
   width: 100%;
-  font-family: var(--font-body);
+  font: inherit;
   font-size: 1rem;
-  color: var(--ink);
-  background: var(--ground);
+  color: var(--black);
+  background: var(--white);
   padding: 0.9rem 1rem;
   min-height: 48px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--grey);
   border-radius: var(--radius);
   transition: border-color 0.18s ease;
 }
-.field input[type="email"]::placeholder { color: var(--ink-faint); }
-.field input[type="email"]:hover { border-color: var(--ink-faint); }
-
-/* Error state, set by script.js */
-.field input.has-error { border-color: var(--clay); }
+.field input[type="email"]::placeholder { color: var(--grey-text); }
+.field input[type="email"]:hover  { border-color: var(--dark-grey); }
+.field input.has-error { border-color: var(--pulse-red); border-width: 2px; }
 
 .field-error {
   min-height: 1.25rem;
   margin: 0.6rem 0 0;
-  font-size: 0.85rem;
-  color: var(--clay);
+  font-size: 0.88rem;
+  color: var(--pulse-red);
 }
-/* The mailto fallback offered when the endpoint is unreachable. */
 .field-error a { color: inherit; }
-
-/* While the signup is in flight. */
-.btn[disabled] {
-  opacity: 0.65;
-  cursor: default;
-}
 
 .honeypot {
   position: absolute;
@@ -785,90 +908,92 @@ a { color: inherit; }
   overflow: hidden;
 }
 
-/* Confirmation state */
 .waitlist-done {
   margin-top: 2rem;
   padding: 1.75rem;
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
+  background: var(--white);
+  border: 2px solid var(--pulse-red);
   border-radius: var(--radius);
 }
 .waitlist-done h3 { margin: 0 0 0.35rem; }
-.waitlist-done p { color: var(--ink-muted); margin: 0; }
-.done-mark {
-  font-size: 1.1rem;
-  color: var(--accent);
-  margin: 0 0 0.5rem;
-}
+.waitlist-done p { color: var(--grey-text); margin: 0; }
+.done-mark { font-size: 1.2rem; color: var(--pulse-red); margin: 0 0 0.5rem; font-weight: 700; }
 
 @media (min-width: 560px) {
   .field { grid-template-columns: 1fr auto; align-items: start; }
 }
 
 
-/* 16. FOOTER =============================================================== */
+/* 19. FOOTER (inverted) ==================================================== */
 
 .site-footer {
-  background: var(--surface);
-  border-top: 1px solid var(--line);
+  background: var(--black);
+  color: var(--white);
   padding-top: clamp(3rem, 6vw, 4.5rem);
 }
-
 .footer-inner {
   display: grid;
   gap: 2.5rem;
   padding-bottom: clamp(2.5rem, 5vw, 3.5rem);
 }
-
 .footer-brand .wordmark { display: block; margin-bottom: 0.6rem; }
-
 .footer-heading {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--pulse-red-text);
   margin: 0 0 0.9rem;
 }
-
 .social { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .social a {
   font-size: 0.9rem;
-  color: var(--ink-muted);
+  color: var(--grey-text-dark);
   text-decoration: none;
   border-bottom: 1px solid transparent;
 }
-.social a:hover { color: var(--ink); border-bottom-color: var(--line-strong); }
+.social a:hover { color: var(--white); border-bottom-color: var(--pulse-red); }
 
-.footer-base { border-top: 1px solid var(--line); padding-block: 1.5rem; }
+.footer-base { border-top: 1px solid var(--dark-grey); padding-block: 1.5rem; }
 
 @media (min-width: 720px) {
   .footer-inner { grid-template-columns: 2fr 1fr 1fr; gap: 3rem; }
 }
 
 
-/* 17. SCROLL REVEAL ========================================================
-   script.js adds .is-visible as elements enter the viewport. If JS never
-   runs, .reveal stays at opacity 1 — content is visible either way, so the
-   page degrades safely. The starting state is applied by JS via .reveal-init.
-   ========================================================================== */
+/* 20. SCROLL REVEAL & REDUCED MOTION ======================================= */
 
+/* Path A — native CSS scroll-driven animation, on the compositor with no
+   scroll listener. Firefox still has this behind a flag, hence @supports;
+   script.js checks the same condition and only runs its IntersectionObserver
+   fallback when this block does NOT apply, so exactly one mechanism runs. */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 45%;
+  }
+  .variant, .edition { animation-range: entry 0% entry 55%; }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Path B — JS fallback. .reveal-init is applied by script.js only when the
+   CSS path is unavailable AND an observer exists to remove it, so content is
+   never stranded invisible. */
 .reveal-init {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(18px);
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
 .reveal-init.is-visible { opacity: 1; transform: none; }
-
-/* Grid children carry --i so a row resolves in sequence rather than all at
-   once. Capped low: past ~90ms per item it stops reading as polish and
-   starts reading as lag. */
-.feature.reveal-init,
+.variant.reveal-init,
 .edition.reveal-init { transition-delay: calc(var(--i, 0) * 60ms); }
 
-/* Respect the OS setting: no motion, no transitions, nothing hidden.
-   The disclosure panels still open and close — they just do it instantly. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -879,4 +1004,19 @@ a { color: inherit; }
   }
   .reveal-init { opacity: 1; transform: none; }
   .progress { display: none; }
+
+  /* Cancel the scroll-driven timeline outright. The blanket
+     animation-duration override above does NOT reach a scroll-driven
+     animation, whose progress comes from scroll position rather than time —
+     without this, content can sit stuck at opacity 0. */
+  .reveal, .variant, .edition {
+    animation: none !important;
+    animation-timeline: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Parallax off, and every step legible rather than dimmed. */
+  .showcase-bg { transform: none !important; }
+  .showcase-step { opacity: 1 !important; }
 }

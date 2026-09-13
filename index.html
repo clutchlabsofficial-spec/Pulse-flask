@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PULSE Flask — The bottle athletes have been missing.</title>
-  <meta name="description" content="A smart water bottle for athletes and hikers. Tap to check your temperature. No app, no exposed charging port, no dead battery on the trail.">
+  <meta name="description" content="A smart water bottle for athletes and hikers. Tap to check your temperature, turn the bezel to set it. Three sizes: Compact 500ml, Standard 800ml, Pro 1L.">
 
-  <!-- Social preview. Swap the image URL once real product photography exists. -->
   <meta property="og:title" content="PULSE Flask">
   <meta property="og:description" content="The bottle athletes have been missing.">
   <meta property="og:type" content="website">
+  <meta name="theme-color" content="#212529">
 
-  <!-- Type: Inter Tight for display, Inter for body. The CSS carries a full
-       system-font fallback stack, so the page still reads correctly offline. -->
+  <!-- Inter, used deliberately: 800 for headlines, 400 for body. The CSS
+       carries a full system fallback stack so the page still reads offline. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -24,9 +24,10 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <!-- ==========================================================================
-     HEADER — slim, sticky. Collapses to a toggle under 640px.
+     HEADER — always dark, so it reads against both the black hero and the
+     white sections below it.
      ========================================================================== -->
-<header class="site-header" id="top">
+<header class="site-header is-inverted" id="top">
   <div class="wrap header-inner">
     <a class="wordmark" href="#top" aria-label="PULSE Flask, back to top">
       PULSE<span class="wordmark-light"> Flask</span>
@@ -38,38 +39,39 @@
     </button>
 
     <nav class="site-nav" id="site-nav" aria-label="Primary">
-      <a href="#features">Features</a>
-      <a href="#pulse-point">PULSE Point</a>
+      <a href="#showcase">How it works</a>
+      <a href="#variants">Sizes</a>
       <a href="#pricing">Pricing</a>
       <a href="#founder">Story</a>
+      <a href="#faq">FAQ</a>
       <a class="btn btn-sm" href="#waitlist">Join the waitlist</a>
     </nav>
   </div>
 
-  <!-- Reading progress. Decorative, so hidden from the accessibility tree —
-       the scrollbar already conveys this to anyone who needs it. -->
+  <!-- Decorative: the scrollbar already conveys this to anyone who needs it. -->
   <div class="progress" aria-hidden="true"><span class="progress-bar" id="progress-bar"></span></div>
 </header>
 
 <main id="main">
 
   <!-- ========================================================================
-       1. HERO
+       1. HERO — inverted
        ======================================================================== -->
-  <section class="hero" aria-labelledby="hero-title">
+  <section class="hero is-inverted" aria-labelledby="hero-title">
     <div class="wrap">
       <div class="hero-copy reveal">
         <p class="eyebrow">Smart bottle · Athletes &amp; hikers</p>
         <h1 id="hero-title">The bottle athletes have been missing.</h1>
         <p class="lead">
           Tap the lid to see your temperature. Turn the bezel to set it.
-          That's the whole interface — no app to install, no account,
-          no phone out of your pocket mid-session.
+          That's the whole interface — no app to install, no account, no phone
+          out of your pocket mid-session.
         </p>
         <a class="btn btn-lg" href="#waitlist">Join the waitlist</a>
       </div>
 
-      <!-- Placeholder: swap this div for an <img> when photography lands. -->
+      <!-- Placeholder: swap for an <img> carrying the same class when
+           photography lands, so the aspect ratio holds and nothing shifts. -->
       <div class="ph ph-hero reveal" role="img"
            aria-label="Placeholder for the hero product photograph">
         <span class="ph-label">Product photo · hero<br>bottle, 3/4 view, LED ring lit</span>
@@ -78,7 +80,7 @@
   </section>
 
   <!-- ========================================================================
-       2. PROBLEM
+       2. PROBLEM — white
        ======================================================================== -->
   <section class="section" id="problem" aria-labelledby="problem-title">
     <div class="wrap wrap-narrow">
@@ -128,336 +130,288 @@
   </section>
 
   <!-- ========================================================================
-       3. FEATURES — hairline grid, 1 col → 2 → 3
+       3. STICKY SHOWCASE — the three-layer scroll mechanic.
+
+       Layer 1  .showcase-bg     translated at 0.3x scroll speed by script.js
+       Layer 2  .showcase-stage  position:sticky, pinned while text scrolls
+       Layer 3  .showcase-step   normal speed, revealed on entry
+
+       script.js observes the steps and mirrors the active one onto the stage
+       via data-active, which swaps the caption and lights the LED ring on the
+       steps where it would genuinely be glowing.
        ======================================================================== -->
-  <section class="section section-alt" id="features" aria-labelledby="features-title">
+  <!-- is-inverted is load-bearing, not decorative: it is what switches the
+       eyebrow, leads and fine print to their light-on-dark colours. Without
+       it this section renders dark-grey text on a black ground. -->
+  <section class="section showcase is-inverted" id="showcase" aria-labelledby="showcase-title">
+    <div class="showcase-bg" aria-hidden="true"></div>
+
     <div class="wrap">
       <div class="section-head reveal">
-        <p class="eyebrow">What's built in</p>
-        <h2 id="features-title">Engineered around how you actually drink.</h2>
-        <p class="section-lead">
-          Every control is something you can operate one-handed, with cold
-          hands, without looking at a screen.
-        </p>
+        <p class="eyebrow">How it works</p>
+        <h2 id="showcase-title">Five things it does, without a screen.</h2>
       </div>
 
-      <div class="ph ph-wide reveal" role="img"
-           aria-label="Placeholder for the product detail photograph">
-        <span class="ph-label">Product photo · detail<br>lid and bezel, close crop</span>
-      </div>
+      <div class="showcase-inner">
+        <!-- Layer 2 -->
+        <div class="showcase-stage" id="stage" data-active="0">
+          <p class="stage-count" aria-hidden="true"><b id="stage-num">01</b> / 05</p>
+          <div class="stage-frame">
+            <p class="stage-caption" id="stage-caption">
+              Product photo · showcase<br>LED ring, lit red
+            </p>
+            <!-- Lights only on the steps where the ring is actually on. -->
+            <span class="stage-led is-lit" id="stage-led" aria-hidden="true"></span>
+          </div>
+        </div>
 
-      <p class="grid-hint reveal">Tap any feature to see how it works.</p>
-
-      <!-- Each feature is a disclosure: a <button> header controlling a panel.
-           Using a real button means keyboard support (Enter/Space), focus and
-           screen-reader semantics all come for free. script.js opens one at a
-           time and keeps the URL hash in sync so a feature can be linked to
-           directly.
-
-           NOTE ON THE SPEC LISTS: every hard number is a [SPEC: …] placeholder
-           on purpose. Fill them in with real measured values — do not guess,
-           this page is going in front of judges. -->
-      <ul class="feature-grid">
-        <li class="feature reveal" style="--i:0">
-          <button class="feature-btn" id="btn-led" aria-expanded="false" aria-controls="panel-led">
-            <span class="feature-index" aria-hidden="true">01</span>
+        <!-- Layer 3 -->
+        <ol class="showcase-steps">
+          <li class="showcase-step reveal is-current"
+              data-step="0"
+              data-caption="Product photo · showcase&lt;br&gt;LED ring, lit red"
+              data-led="on">
+            <span class="showcase-step-index" aria-hidden="true">01</span>
             <h3>Tap-to-glow LED ring</h3>
             <p>
-              One tap on the lid and a ring around the cap glows to show the
-              current temperature. It reads at a glance, in daylight or dark,
-              then fades back out on its own.
+              One tap on the lid and the ring around the cap glows to show the
+              current temperature. It reads at a glance, then fades out on its
+              own — an always-on display is why the others are flat by Thursday.
             </p>
-            <span class="feature-more">
-              <span class="feature-more-text">How it works</span>
-              <span class="feature-sign" aria-hidden="true"></span>
-            </span>
-          </button>
+          </li>
 
-          <div class="feature-panel" id="panel-led" role="region" aria-labelledby="btn-led" hidden>
-            <div class="feature-panel-inner">
-              <p>
-                The ring sits under the cap's outer edge, so the light washes
-                across the lid rather than shining at you. Tap once and it
-                reads the current water temperature and lights the arc that
-                corresponds to it.
-              </p>
-              <p>
-                It stays lit only long enough to read, then fades. That matters
-                more than it sounds: an always-on display is the single biggest
-                drain on every smart bottle we looked at, and it's the reason
-                theirs are flat by Thursday.
-              </p>
-              <div class="ph ph-panel" role="img" aria-label="Placeholder for the LED ring detail photograph">
-                <span class="ph-label">Product photo · detail<br>LED ring lit, low light</span>
-              </div>
-              <dl class="spec">
-                <div><dt>Readout</dt><dd>Colour arc around the cap</dd></div>
-                <div><dt>Activation</dt><dd>Single tap on the lid</dd></div>
-                <div><dt>Time lit</dt><dd>[SPEC: seconds before fade]</dd></div>
-                <div><dt>Temp range</dt><dd>[SPEC: °C low – °C high]</dd></div>
-              </dl>
-            </div>
-          </div>
-        </li>
-
-        <li class="feature reveal" style="--i:1">
-          <button class="feature-btn" id="btn-bezel" aria-expanded="false" aria-controls="panel-bezel">
-            <span class="feature-index" aria-hidden="true">02</span>
+          <li class="showcase-step reveal"
+              data-step="1"
+              data-caption="Product photo · detail&lt;br&gt;bezel, hand turning"
+              data-led="off">
+            <span class="showcase-step-index" aria-hidden="true">02</span>
             <h3>Rotating bezel</h3>
             <p>
-              Turn the bezel to set your warmth target. It's a physical detent
-              you can feel through gloves — the setting lives on the bottle,
-              not in an app you'd have to open first.
+              Turn the bezel to set your warmth target. It clicks through fixed
+              detents you can count by feel through gloves, and the setting
+              lives on the bottle — not in an app you'd have to open first.
             </p>
-            <span class="feature-more">
-              <span class="feature-more-text">How it works</span>
-              <span class="feature-sign" aria-hidden="true"></span>
-            </span>
-          </button>
+          </li>
 
-          <div class="feature-panel" id="panel-bezel" role="region" aria-labelledby="btn-bezel" hidden>
-            <div class="feature-panel-inner">
-              <p>
-                The bezel clicks through fixed positions rather than sweeping
-                freely, so you can count detents by feel and know where you
-                landed without looking. With gloves on, in the dark, that's the
-                difference between a control you use and one you don't.
-              </p>
-              <p>
-                Because the target is stored mechanically on the bottle, there
-                is no pairing step, no account, and nothing to re-sync when you
-                change phones. The bottle behaves the same whether your phone
-                is in your pocket or at home.
-              </p>
-              <div class="ph ph-panel" role="img" aria-label="Placeholder for the bezel detail photograph">
-                <span class="ph-label">Product photo · detail<br>bezel, hand turning</span>
-              </div>
-              <dl class="spec">
-                <div><dt>Control</dt><dd>Indexed rotating bezel</dd></div>
-                <div><dt>Gloved use</dt><dd>Yes — tactile detents</dd></div>
-                <div><dt>Positions</dt><dd>[SPEC: number of detents]</dd></div>
-                <div><dt>App required</dt><dd>None</dd></div>
-              </dl>
-            </div>
-          </div>
-        </li>
-
-        <li class="feature reveal" style="--i:2">
-          <button class="feature-btn" id="btn-charge" aria-expanded="false" aria-controls="panel-charge">
-            <span class="feature-index" aria-hidden="true">03</span>
+          <li class="showcase-step reveal"
+              data-step="2"
+              data-caption="Product photo · detail&lt;br&gt;magnetic puck on base"
+              data-led="off">
+            <span class="showcase-step-index" aria-hidden="true">03</span>
             <h3>Magnetic charging</h3>
             <p>
-              The charge contacts are sealed and flush. There is no port to
-              leave open, no rubber flap to tear off, and nothing on the
-              outside for grit and sweat to work into.
+              A magnetic puck lands on the twist-off base and self-aligns. The
+              contacts sit flush and sealed — no port to leave open, no rubber
+              flap to tear off, nothing for grit and sweat to work into.
             </p>
-            <span class="feature-more">
-              <span class="feature-more-text">How it works</span>
-              <span class="feature-sign" aria-hidden="true"></span>
-            </span>
-          </button>
+          </li>
 
-          <div class="feature-panel" id="panel-charge" role="region" aria-labelledby="btn-charge" hidden>
-            <div class="feature-panel-inner">
-              <p>
-                A magnetic puck lands on the base and self-aligns, so there's no
-                orientation to get right. The contacts sit flush with the
-                housing, which means there is no cavity for grit, sweat or
-                drink mix to collect in.
-              </p>
-              <p>
-                This is the part of the design we're least willing to
-                compromise on. An exposed MicroUSB port on a container you fill
-                with water is a failure waiting to happen, and it's the most
-                common thing wrong with the bottles already on sale.
-              </p>
-              <div class="ph ph-panel" role="img" aria-label="Placeholder for the magnetic charger detail photograph">
-                <span class="ph-label">Product photo · detail<br>magnetic puck on base</span>
-              </div>
-              <dl class="spec">
-                <div><dt>Connector</dt><dd>Sealed magnetic contacts</dd></div>
-                <div><dt>Exposed port</dt><dd>None</dd></div>
-                <div><dt>Charge time</dt><dd>[SPEC: hours 0–100%]</dd></div>
-                <div><dt>Battery life</dt><dd>[SPEC: days typical use]</dd></div>
-                <div><dt>Water rating</dt><dd>[SPEC: IP rating]</dd></div>
-              </dl>
-            </div>
-          </div>
+          <li class="showcase-step reveal"
+              data-step="3"
+              data-caption="Product photo · detail&lt;br&gt;latch, thumb on rocker"
+              data-led="off">
+            <span class="showcase-step-index" aria-hidden="true">04</span>
+            <h3>Rocker latch, two-stage catch</h3>
+            <p>
+              Flick it and it's open — no twisting a cap off one-handed. The
+              first stage holds the spout shut against knocks in a bag; only a
+              deliberate second movement releases it. No spring to go soft.
+            </p>
+          </li>
+
+          <li class="showcase-step reveal"
+              data-step="4"
+              data-caption="Product photo · detail&lt;br&gt;cap interior, UV-C emitter"
+              data-led="on">
+            <span class="showcase-step-index" aria-hidden="true">05</span>
+            <h3>Dual-sensor UV-C</h3>
+            <p>
+              UV-C treats the water inside the bottle. Two sensors working on
+              different principles — one optical, one magnetic — must both
+              agree the cap is sealed before the lamp fires. Either one
+              disagreeing mid-cycle cuts it immediately.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       4. THREE VARIANTS
+       All figures supplied by the founder. Standard is the launch SKU.
+       ======================================================================== -->
+  <section class="section section-alt" id="variants" aria-labelledby="variants-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Three sizes</p>
+        <h2 id="variants-title">Same engineering. Pick your capacity.</h2>
+        <p class="section-lead">
+          All three reach 165&nbsp;°F in about fifteen minutes — the heater and
+          battery scale with the bottle so the time doesn't.
+        </p>
+      </div>
+
+      <ul class="variant-grid">
+        <li class="variant reveal" style="--i:0">
+          <span class="variant-spacer" aria-hidden="true"></span>
+          <h3>Compact</h3>
+          <p class="variant-size">500 ml</p>
+          <p class="variant-price">$120</p>
+          <p class="variant-range">Expected $95–130</p>
+          <dl class="variant-spec">
+            <div><dt>Heating chamber</dt><dd>430 ml</dd></div>
+            <div><dt>Battery</dt><dd>30 Wh</dd></div>
+            <div><dt>Heater</dt><dd>120 W</dd></div>
+            <div><dt>To 165 °F</dt><dd>~15 min</dd></div>
+          </dl>
         </li>
 
-        <li class="feature reveal" style="--i:3">
-          <button class="feature-btn" id="btn-latch" aria-expanded="false" aria-controls="panel-latch">
-            <span class="feature-index" aria-hidden="true">04</span>
-            <h3>Rocker latch spout</h3>
-            <p>
-              A side-mounted rocker latch with a two-stage safety catch. Flick
-              it and it's open — no twisting a cap off one-handed, and no
-              spring to lose its tension over a season.
-            </p>
-            <span class="feature-more">
-              <span class="feature-more-text">How it works</span>
-              <span class="feature-sign" aria-hidden="true"></span>
-            </span>
-          </button>
-
-          <div class="feature-panel" id="panel-latch" role="region" aria-labelledby="btn-latch" hidden>
-            <div class="feature-panel-inner">
-              <p>
-                The latch sits on the side of the lid, where your thumb already
-                is when you pick the bottle up. One flick opens the spout — no
-                twisting, and nothing to put down first.
-              </p>
-              <p>
-                The catch works in two stages: the first holds the spout shut
-                against knocks in a bag, and only a deliberate second movement
-                releases it. That's what stops it opening against your kit
-                while you're running.
-              </p>
-              <p>
-                It's a rocker rather than a sprung push-button on purpose.
-                Springs are the part that goes soft after a season of hard use,
-                and a latch that no longer holds is worse than no latch at all.
-              </p>
-              <div class="ph ph-panel" role="img" aria-label="Placeholder for the rocker latch detail photograph">
-                <span class="ph-label">Product photo · detail<br>latch, thumb on rocker</span>
-              </div>
-              <dl class="spec">
-                <div><dt>Action</dt><dd>Side rocker, one-handed</dd></div>
-                <div><dt>Safety</dt><dd>Two-stage catch</dd></div>
-                <div><dt>Springs</dt><dd>None in the latch path</dd></div>
-                <div><dt>Cycle life</dt><dd>[SPEC: tested open/close cycles]</dd></div>
-              </dl>
-            </div>
-          </div>
+        <li class="variant variant--launch reveal" style="--i:1">
+          <span class="variant-tag">Launch SKU</span>
+          <h3>Standard</h3>
+          <p class="variant-size">800 ml</p>
+          <p class="variant-price">$165</p>
+          <p class="variant-range">Expected $140–195</p>
+          <dl class="variant-spec">
+            <div><dt>Heating chamber</dt><dd>770 ml</dd></div>
+            <div><dt>Battery</dt><dd>54 Wh</dd></div>
+            <div><dt>Heater</dt><dd>216 W</dd></div>
+            <div><dt>To 165 °F</dt><dd>~15 min</dd></div>
+          </dl>
         </li>
 
-        <li class="feature reveal" style="--i:4">
-          <button class="feature-btn" id="btn-uvc" aria-expanded="false" aria-controls="panel-uvc">
-            <span class="feature-index" aria-hidden="true">05</span>
-            <h3>UV-C purification, interlocked</h3>
-            <p>
-              UV-C treats the water inside the bottle. Two independent sensors —
-              one for light, one magnetic — have to agree the cap is sealed
-              before the lamp will fire. If either disagrees, it won't run.
-            </p>
-            <span class="feature-more">
-              <span class="feature-more-text">How it works</span>
-              <span class="feature-sign" aria-hidden="true"></span>
-            </span>
-          </button>
-
-          <div class="feature-panel" id="panel-uvc" role="region" aria-labelledby="btn-uvc" hidden>
-            <div class="feature-panel-inner">
-              <p>
-                UV-C is genuinely effective at treating water, and genuinely
-                bad for eyes and skin. So the lamp is gated behind two sensors
-                that work on completely different principles: a light sensor
-                that confirms the chamber is dark, and a magnetic sensor that
-                confirms the cap is physically seated.
-              </p>
-              <p>
-                Both have to agree before the lamp will fire, and either one
-                disagreeing mid-cycle cuts it immediately. Two different sensing
-                methods means a single failure — a stuck sensor, a spoofed
-                reading, a cracked lens — can't be enough to expose anyone.
-              </p>
-              <p>
-                This is the feature that made the rest of the bottle worth
-                building. Safe drinking water is the reason it exists.
-              </p>
-              <div class="ph ph-panel" role="img" aria-label="Placeholder for the UV-C system detail photograph">
-                <span class="ph-label">Product photo · detail<br>cap interior, UV-C emitter</span>
-              </div>
-              <dl class="spec">
-                <div><dt>Interlock</dt><dd>Light sensor + magnetic sensor, both required</dd></div>
-                <div><dt>Fail state</dt><dd>Lamp off</dd></div>
-                <div><dt>Cycle time</dt><dd>[SPEC: seconds per cycle]</dd></div>
-                <div><dt>Wavelength</dt><dd>[SPEC: nm]</dd></div>
-                <div><dt>Tested against</dt><dd>[SPEC: lab results — leave blank until tested]</dd></div>
-              </dl>
-            </div>
-          </div>
-        </li>
-
-        <li class="feature reveal" style="--i:5">
-          <button class="feature-btn" id="btn-boost" aria-expanded="false" aria-controls="panel-boost">
-            <span class="feature-index" aria-hidden="true">06</span>
-            <h3><span class="tag-clay">Boost Mode</span></h3>
-            <p>
-              Hold the lid for two seconds for a modest active warm-up. It's a
-              few degrees to take the chill off a cold drink, not a kettle —
-              we'd rather say that plainly than oversell it.
-            </p>
-            <span class="feature-more">
-              <span class="feature-more-text">How it works</span>
-              <span class="feature-sign" aria-hidden="true"></span>
-            </span>
-          </button>
-
-          <div class="feature-panel" id="panel-boost" role="region" aria-labelledby="btn-boost" hidden>
-            <div class="feature-panel-inner">
-              <p>
-                A two-second hold on the lid — deliberately longer than the tap
-                that reads temperature, so you can't trigger it by accident —
-                runs a short active warm-up.
-              </p>
-              <p>
-                Here is the honest version: heating liquid takes real energy,
-                and a bottle you carry all day can only hold so much battery.
-                Boost takes the chill off. It will not make a cold drink hot,
-                and any bottle claiming otherwise is either carrying a battery
-                you wouldn't want to hike with or isn't telling you the truth.
-              </p>
-              <p>
-                The insulation does the heavy lifting. Boost is for the top-up.
-              </p>
-              <div class="ph ph-panel" role="img" aria-label="Placeholder for the Boost Mode detail photograph">
-                <span class="ph-label">Product photo · detail<br>hand holding lid, ring pulsing</span>
-              </div>
-              <dl class="spec">
-                <div><dt>Trigger</dt><dd>Two-second hold</dd></div>
-                <div><dt>Realistic gain</dt><dd>[SPEC: °C rise]</dd></div>
-                <div><dt>Run time</dt><dd>[SPEC: minutes per boost]</dd></div>
-                <div><dt>Battery cost</dt><dd>[SPEC: % per boost]</dd></div>
-              </dl>
-            </div>
-          </div>
+        <li class="variant reveal" style="--i:2">
+          <span class="variant-spacer" aria-hidden="true"></span>
+          <h3>Pro</h3>
+          <p class="variant-size">1 L</p>
+          <p class="variant-price">$190</p>
+          <p class="variant-range">Expected $155–220</p>
+          <dl class="variant-spec">
+            <div><dt>Heating chamber</dt><dd>855 ml</dd></div>
+            <div><dt>Battery</dt><dd>60 Wh</dd></div>
+            <div><dt>Heater</dt><dd>240 W</dd></div>
+            <div><dt>To 165 °F</dt><dd>~15 min</dd></div>
+          </dl>
         </li>
       </ul>
+
+      <p class="fine platform-note reveal">
+        One platform, three sizes. All three share the same electronics module,
+        heater design, rocker latch, UV-C system and twist-off base — only the
+        chamber size, battery capacity and heater wattage scale.
+        Compact and Pro follow Standard.
+      </p>
     </div>
   </section>
 
   <!-- ========================================================================
-       4. PULSE POINT — companion product, deliberately smaller billing
+       5. CATEGORY COMPARISON
+       No competitor is named and no competitor spec is invented. Every claim
+       in the middle column is one the Problem section already makes, stated
+       as a category generalisation rather than about any single product.
        ======================================================================== -->
-  <section class="section section-tight" id="pulse-point" aria-labelledby="pp-title">
+  <section class="section" id="compare" aria-labelledby="compare-title">
     <div class="wrap wrap-narrow">
-     <div class="pp-inner">
-      <div class="pp-copy reveal">
-        <p class="eyebrow">Optional companion</p>
-        <h2 id="pp-title" class="h3-scale">PULSE Point</h2>
-        <p>
-          A small wrist accessory that mixes electrolytes on demand, so you
-          can dose mid-run without stopping to tear open a sachet. It pairs
-          with the flask but isn't required by it.
-        </p>
-        <p class="fine">
-          A separate product on its own timeline. The flask comes first.
-        </p>
+      <p class="eyebrow reveal">How it compares</p>
+      <h2 id="compare-title" class="reveal">Where the category falls down.</h2>
+      <p class="section-lead reveal">
+        Not a swipe at anyone in particular — these are the patterns we kept
+        running into across the smart bottles we could actually buy and test.
+      </p>
+
+      <div class="compare-wrap reveal">
+        <table class="compare">
+          <caption class="visually-hidden">
+            PULSE Flask compared with typical smart bottles and plain insulated bottles
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">&nbsp;</th>
+              <th scope="col" class="col-pulse">PULSE Flask</th>
+              <th scope="col">Typical smart bottle</th>
+              <th scope="col">Plain insulated bottle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Reads temperature</th>
+              <td class="col-pulse">Tap the lid</td>
+              <td>Usually, via an app</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <th scope="row">Needs a phone</th>
+              <td class="col-pulse">Never</td>
+              <td>Commonly, to change anything</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <th scope="row">Charging port</th>
+              <td class="col-pulse">Sealed magnetic contacts</td>
+              <td>Often exposed, often MicroUSB</td>
+              <td>None needed</td>
+            </tr>
+            <tr>
+              <th scope="row">Actively heats</th>
+              <td class="col-pulse">Yes — 165 °F in ~15 min</td>
+              <td>Rarely</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <th scope="row">Purifies water</th>
+              <td class="col-pulse">UV-C, dual-sensor interlock</td>
+              <td>Rarely</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <th scope="row">Still useful flat</th>
+              <td class="col-pulse">Yes — it's a bottle first</td>
+              <td>Yes, but you've paid for a dead screen</td>
+              <td>Yes</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="ph ph-square reveal" role="img"
-           aria-label="Placeholder for the PULSE Point accessory photograph">
-        <span class="ph-label">Product photo<br>PULSE Point on wrist</span>
-      </div>
-     </div>
+      <p class="fine compare-note reveal">
+        "Typical smart bottle" describes patterns common across the category,
+        not any single product. We haven't tested every bottle on the market.
+      </p>
     </div>
   </section>
 
   <!-- ========================================================================
-       5. WHAT'S NEXT — future editions, explicitly not for sale yet
+       6. PULSE POINT — companion product, deliberately smaller billing
        ======================================================================== -->
-  <section class="section section-alt" id="whats-next" aria-labelledby="next-title">
+  <section class="section section-tight section-alt" id="pulse-point" aria-labelledby="pp-title">
+    <div class="wrap wrap-narrow">
+      <div class="pp-inner">
+        <div class="pp-copy reveal">
+          <p class="eyebrow">Optional companion</p>
+          <h3 id="pp-title">PULSE Point</h3>
+          <p>
+            A small wrist accessory that mixes electrolytes on demand, so you
+            can dose mid-run without stopping to tear open a sachet. It pairs
+            with the flask but isn't required by it.
+          </p>
+          <p class="fine">
+            A separate product on its own timeline. The flask comes first.
+          </p>
+        </div>
+
+        <div class="ph ph-square reveal" role="img"
+             aria-label="Placeholder for the PULSE Point accessory photograph">
+          <span class="ph-label">Product photo<br>PULSE Point on wrist</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       7. WHAT'S NEXT — nothing here is purchasable
+       ======================================================================== -->
+  <section class="section" id="whats-next" aria-labelledby="next-title">
     <div class="wrap">
       <div class="section-head reveal">
         <p class="eyebrow">What's next</p>
@@ -489,10 +443,10 @@
   </section>
 
   <!-- ========================================================================
-       6. FOUNDER — the one place the young-founder voice appears.
-          Copy supplied by the founder; kept first-person and unembellished.
+       8. FOUNDER — inverted. The one place the young-founder voice appears.
+       Copy supplied by the founder; kept first-person and unembellished.
        ======================================================================== -->
-  <section class="section" id="founder" aria-labelledby="founder-title">
+  <section class="section is-inverted" id="founder" aria-labelledby="founder-title">
     <div class="wrap founder-inner">
       <div class="ph ph-portrait reveal" role="img"
            aria-label="Placeholder for the founder portrait photograph">
@@ -501,7 +455,7 @@
 
       <div class="founder-copy reveal">
         <p class="eyebrow">Why this exists</p>
-        <h2 id="founder-title" class="h3-scale">A note from the founder</h2>
+        <h2 id="founder-title">A note from the founder</h2>
         <blockquote class="founder-quote">
           <p>
             I'm 12, based in India, and I play football, badminton, pickleball
@@ -524,8 +478,9 @@
   </section>
 
   <!-- ========================================================================
-       7. PRICING TRANSPARENCY
-          >>> All figures live in this one table. Update here and nowhere else.
+       9. PRICING TRANSPARENCY
+       >>> All figures live in this one table. Update here and nowhere else.
+           Margin = (retail - landed) / retail, rounded.
        ======================================================================== -->
   <section class="section section-alt" id="pricing" aria-labelledby="pricing-title">
     <div class="wrap wrap-narrow">
@@ -533,26 +488,40 @@
       <h2 id="pricing-title" class="reveal">We're transparent about how this is priced.</h2>
       <p class="section-lead reveal">
         Hardware companies usually don't show you this. There's no good reason
-        not to, so here is what the flask costs to make and what it will sell for.
+        not to, so here is what each size costs to land and what it will sell for.
       </p>
 
       <div class="ledger-wrap reveal">
         <table class="ledger">
           <caption class="visually-hidden">
-            Landed cost, retail price and gross margin for PULSE Flask
+            Landed cost, retail price and gross margin for each PULSE Flask size
           </caption>
+          <thead>
+            <tr>
+              <th scope="col">Size</th>
+              <th scope="col" class="num">Landed cost</th>
+              <th scope="col" class="num">Retail</th>
+              <th scope="col" class="num">Gross margin</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <th scope="row">Landed cost per unit</th>
-              <td class="num">~$30</td>
+              <th scope="row">Compact · 500 ml</th>
+              <td class="num">~$82</td>
+              <td class="num">$120</td>
+              <td class="num margin">32%</td>
             </tr>
             <tr>
-              <th scope="row">Retail price <span class="fine-inline">(MSRP)</span></th>
-              <td class="num">$69 – $84</td>
+              <th scope="row">Standard · 800 ml</th>
+              <td class="num">~$117</td>
+              <td class="num">$165</td>
+              <td class="num margin">29%</td>
             </tr>
-            <tr class="ledger-total">
-              <th scope="row">Gross margin</th>
-              <td class="num">~59%</td>
+            <tr>
+              <th scope="row">Pro · 1 L</th>
+              <td class="num">~$128</td>
+              <td class="num">$190</td>
+              <td class="num margin">33%</td>
             </tr>
           </tbody>
         </table>
@@ -560,22 +529,147 @@
 
       <p class="fine reveal">
         Landed cost covers manufacturing plus shipping and duties into market.
-        Final retail will land inside that range once tooling and freight are
-        locked.
+        Final retail will land inside the ranges shown on each size once
+        tooling and freight are locked.
       </p>
 
       <p class="reveal">
-        The margin isn't profit sitting in a pocket. It pays for warranty
-        replacements, returns, support, amortising the tooling, and funding the
-        next version. We'd rather show the number and explain it than hide it.
+        Under a third isn't a large margin for hardware, and that's deliberate
+        — an active heater, a UV-C module and a real battery cost what they
+        cost. What's left pays for warranty replacements, returns, support,
+        amortising the tooling, and funding the next version. We'd rather show
+        the number and explain it than hide it.
       </p>
     </div>
   </section>
 
   <!-- ========================================================================
-       8. WAITLIST — front-end only. Nothing is transmitted anywhere.
+       10. FAQ — same disclosure mechanics as elsewhere: a real <button>
+       controlling a panel, so keyboard and screen-reader support come from
+       the markup rather than from JavaScript.
        ======================================================================== -->
-  <section class="section" id="waitlist" aria-labelledby="waitlist-title">
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap wrap-narrow">
+      <p class="eyebrow reveal">Questions</p>
+      <h2 id="faq-title" class="reveal">The things people actually ask.</h2>
+
+      <ul class="faq">
+        <li class="faq-item reveal">
+          <button class="faq-btn" id="faq-1-btn" aria-expanded="false" aria-controls="faq-1">
+            <h3>When does it ship?</h3>
+            <span class="sign" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-1" role="region" aria-labelledby="faq-1-btn" hidden>
+            <div class="faq-panel-inner">
+              <p>
+                No date yet, and we'd rather say that than invent one. Standard
+                800 ml is the launch SKU; Compact and Pro follow. The waitlist
+                gets a single email when it's genuinely ready to order.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="faq-item reveal">
+          <button class="faq-btn" id="faq-2-btn" aria-expanded="false" aria-controls="faq-2">
+            <h3>Is there an app?</h3>
+            <span class="sign" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-2" role="region" aria-labelledby="faq-2-btn" hidden>
+            <div class="faq-panel-inner">
+              <p>
+                No, and that's deliberate. Everything the bottle does is on the
+                bottle — tap to read, turn to set. There's no account, no
+                pairing, and nothing to re-sync when you change phones.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="faq-item reveal">
+          <button class="faq-btn" id="faq-3-btn" aria-expanded="false" aria-controls="faq-3">
+            <h3>Is UV-C safe?</h3>
+            <span class="sign" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-3" role="region" aria-labelledby="faq-3-btn" hidden>
+            <div class="faq-panel-inner">
+              <p>
+                UV-C is effective on water and genuinely harmful to eyes and
+                skin, which is why the lamp is gated behind two independent
+                sensors — one optical, one magnetic. Both must agree the cap is
+                sealed before it fires, and either one disagreeing mid-cycle
+                cuts it immediately.
+              </p>
+              <p>
+                Independent lab results will be published before launch. There
+                are no numbers on this page because testing isn't finished.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="faq-item reveal">
+          <button class="faq-btn" id="faq-4-btn" aria-expanded="false" aria-controls="faq-4">
+            <h3>What happens when the battery dies?</h3>
+            <span class="sign" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-4" role="region" aria-labelledby="faq-4-btn" hidden>
+            <div class="faq-panel-inner">
+              <p>
+                It's still a vacuum-insulated bottle. The latch opens, the
+                insulation works, and you drink from it exactly as before — you
+                just lose the readout, the bezel target, heating and UV-C until
+                you charge it. A flat battery shouldn't turn a bottle into
+                luggage.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="faq-item reveal">
+          <button class="faq-btn" id="faq-5-btn" aria-expanded="false" aria-controls="faq-5">
+            <h3>Why do all three sizes take the same 15 minutes?</h3>
+            <span class="sign" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-5" role="region" aria-labelledby="faq-5-btn" hidden>
+            <div class="faq-panel-inner">
+              <p>
+                Because the heater scales with the bottle. Compact runs 120 W
+                against a 430 ml chamber; Pro runs 240 W against 855 ml. Twice
+                the water, twice the heater — so the time to 165 °F stays
+                roughly flat across the range instead of punishing you for
+                buying the big one.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="faq-item reveal">
+          <button class="faq-btn" id="faq-6-btn" aria-expanded="false" aria-controls="faq-6">
+            <h3>Who's building this?</h3>
+            <span class="sign" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-6" role="region" aria-labelledby="faq-6-btn" hidden>
+            <div class="faq-panel-inner">
+              <p>
+                A 12-year-old founder in India who spec'd the whole thing —
+                features, materials and cost structure — after a bout of
+                typhoid from contaminated water. The full story is
+                <a href="#founder">further up this page</a>.
+              </p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       11. WAITLIST
+       Front-end only unless WAITLIST_ENDPOINT is set in script.js. With it
+       empty, the address never leaves the browser.
+       ======================================================================== -->
+  <section class="section section-alt" id="waitlist" aria-labelledby="waitlist-title">
     <div class="wrap wrap-narrow">
       <p class="eyebrow reveal">Waitlist</p>
       <h2 id="waitlist-title" class="reveal">Be first to know when it ships.</h2>
@@ -584,24 +678,18 @@
         forwarding your address to anyone.
       </p>
 
-      <!-- novalidate: we handle validation in script.js so the error styling
-           and messaging stay consistent across browsers. -->
+      <!-- novalidate: validation is handled in script.js so the messaging and
+           error styling are identical across browsers. -->
       <form class="waitlist-form reveal" id="waitlist-form" novalidate>
         <div class="field">
           <label class="visually-hidden" for="email">Email address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            inputmode="email"
-            autocomplete="email"
-            placeholder="you@example.com"
-            aria-describedby="email-error"
-            required>
+          <input type="email" id="email" name="email" inputmode="email"
+                 autocomplete="email" placeholder="you@example.com"
+                 aria-describedby="email-error" required>
           <button class="btn" type="submit">Join the waitlist</button>
         </div>
 
-        <!-- Honeypot: hidden from people, tempting to bots. -->
+        <!-- Hidden from people, tempting to bots. Checked server-side too. -->
         <div class="honeypot" aria-hidden="true">
           <label for="company">Company</label>
           <input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
@@ -610,16 +698,14 @@
         <p class="field-error" id="email-error" role="alert"></p>
       </form>
 
-      <!-- Swapped in by script.js on a successful submit. -->
       <div class="waitlist-done" id="waitlist-done" role="status" aria-live="polite" hidden>
         <p class="done-mark" aria-hidden="true">✓</p>
         <h3>Thanks — you're on the list.</h3>
         <p>We'll email you once when the flask is ready to order.</p>
       </div>
 
-      <p class="fine reveal">
-        This form is a front-end demo — your address stays in your browser and
-        isn't sent anywhere yet.
+      <p class="fine reveal" id="waitlist-note">
+        Your address is only used to tell you when the flask ships.
       </p>
     </div>
   </section>
@@ -627,9 +713,9 @@
 </main>
 
 <!-- ==========================================================================
-     9. FOOTER
+     12. FOOTER — inverted
      ========================================================================== -->
-<footer class="site-footer" aria-labelledby="footer-title">
+<footer class="site-footer is-inverted" aria-labelledby="footer-title">
   <div class="wrap footer-inner">
     <div class="footer-brand">
       <p class="wordmark" id="footer-title">PULSE<span class="wordmark-light"> Flask</span></p>
@@ -638,9 +724,7 @@
 
     <div class="footer-col">
       <h2 class="footer-heading">Pitch</h2>
-      <p class="fine">
-        Applying to <strong>CoCreate Pitch 2026</strong>, London.
-      </p>
+      <p class="fine">Applying to <strong>CoCreate Pitch 2026</strong>, London.</p>
     </div>
 
     <div class="footer-col">

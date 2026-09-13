@@ -4,13 +4,13 @@
    No libraries, no build step. Independent modules:
      0. Config
      1. Mobile nav toggle
-     2. Scroll reveal
-     3. Feature disclosures
-     4. Waitlist form
-     5. Reading progress bar
-     6. Scrollspy
-     7. Pricing count-up
-     8. Sticky-header offset for anchor links
+     2. Scroll reveal   (fallback only — CSS handles this where supported)
+     3. Showcase        (parallax layer + active-step state)
+     4. FAQ disclosures
+     5. Waitlist form
+     6. Reading progress bar
+     7. Scrollspy
+     8. Anchor scroll
 
    Everything here is progressive enhancement: if this file fails to load,
    the page is still fully readable and every section is visible.
@@ -27,7 +27,7 @@
      #  Setup walkthrough is in README.md → "Collecting signups".      #
      #                                                                 #
      #  Leave it empty and the form still works — it just confirms     #
-     #  locally without sending anywhere, exactly as it does today.    #
+     #  locally without sending anywhere.                              #
      ###################################################################  */
   var WAITLIST_ENDPOINT = "";
 
@@ -41,9 +41,18 @@
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
+  /* Does the browser do scroll-driven animations natively? If so the CSS
+     @supports block already handles every reveal on the compositor, and the
+     JS fallback below must NOT also run — two mechanisms fighting over the
+     same elements is how content ends up stuck at opacity 0. Firefox is the
+     current holdout (still behind a flag), so the fallback stays. */
+  var hasScrollTimeline =
+    typeof CSS !== "undefined" &&
+    CSS.supports &&
+    CSS.supports("animation-timeline: view()");
 
-  /* 1. MOBILE NAV =========================================================
-     The nav is CSS-hidden below 720px and revealed by the .is-open class. */
+
+  /* 1. MOBILE NAV ========================================================= */
 
   var navToggle = document.getElementById("nav-toggle");
   var nav = document.getElementById("site-nav");
@@ -58,12 +67,10 @@
       setNav(navToggle.getAttribute("aria-expanded") !== "true");
     });
 
-    /* Tapping a link should close the menu and let the jump happen. */
     nav.addEventListener("click", function (event) {
       if (event.target.closest("a")) setNav(false);
     });
 
-    /* Escape closes the menu and returns focus to the button. */
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && navToggle.getAttribute("aria-expanded") === "true") {
         setNav(false);
@@ -73,50 +80,133 @@
   }
 
 
-  /* 2. SCROLL REVEAL ======================================================
-     Elements marked .reveal in the HTML fade and rise into place once.
-
-     Note the ordering: .reveal-init (which sets opacity 0) is only applied
-     by JS, and only when we know an observer is available to remove it.
-     That way a browser without IntersectionObserver — or with JS disabled —
-     never ends up with permanently invisible content. */
+  /* 2. SCROLL REVEAL (fallback) ===========================================
+     .reveal-init sets opacity 0, so it is applied only when we know both
+     that the CSS path is unavailable AND that an observer exists to remove
+     it. A browser with neither never ends up with invisible content. */
 
   var revealables = document.querySelectorAll(".reveal");
 
-  if (revealables.length && "IntersectionObserver" in window && !prefersReducedMotion) {
-    revealables.forEach(function (el) {
-      el.classList.add("reveal-init");
-    });
+  if (revealables.length && "IntersectionObserver" in window &&
+      !prefersReducedMotion && !hasScrollTimeline) {
+    revealables.forEach(function (el) { el.classList.add("reveal-init"); });
 
     var revealObserver = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
           entry.target.classList.add("is-visible");
-          revealObserver.unobserve(entry.target);   // reveal once, then stop
+          revealObserver.unobserve(entry.target);
         });
       },
       { rootMargin: "0px 0px -10% 0px", threshold: 0.05 }
     );
 
-    revealables.forEach(function (el) {
-      revealObserver.observe(el);
-    });
+    revealables.forEach(function (el) { revealObserver.observe(el); });
   }
 
 
-  /* 3. FEATURE DISCLOSURES ================================================
-     Each feature card's header is a <button> controlling a panel. Using a
-     real button means Enter, Space, focus and screen-reader semantics all
-     work without us implementing them.
+  /* 3. SHOWCASE ===========================================================
+     Two independent pieces of the three-layer mechanic:
 
-     The panel animates via CSS (grid-template-rows 0fr → 1fr); all this does
-     is toggle `hidden` and a class, and keep the URL hash in sync so a single
-     feature can be linked to directly. */
+       a) the background layer, translated at 0.3x scroll speed
+       b) the active-step state, mirrored from the scrolling copy onto the
+          pinned stage (caption swap + LED ring)
 
-  var featureButtons = [].slice.call(document.querySelectorAll(".feature-btn"));
+     The sticky pinning itself is pure CSS — nothing here is required for the
+     stage to pin, only for it to react. */
 
-  if (featureButtons.length) {
+  var showcase = document.getElementById("showcase");
+  var showcaseBg = showcase && showcase.querySelector(".showcase-bg");
+  var stage = document.getElementById("stage");
+  var steps = [].slice.call(document.querySelectorAll(".showcase-step"));
+
+  /* Both pieces share one rAF-throttled scroll handler: a single read of
+     layout per frame, then at most two writes. Parallax is skipped under
+     reduced motion, but the active-step tracking still runs — the mechanic
+     has to work without motion, not just look different. */
+  if (showcase && stage && steps.length) {
+    var stageCaption = document.getElementById("stage-caption");
+    var stageLed = document.getElementById("stage-led");
+    var stageNum = document.getElementById("stage-num");
+    var showcaseTicking = false;
+
+    var setActiveStep = function (step) {
+      var index = Number(step.getAttribute("data-step")) || 0;
+      if (stage.getAttribute("data-active") === String(index)) return;
+
+      stage.setAttribute("data-active", String(index));
+      steps.forEach(function (other) {
+        other.classList.toggle("is-current", other === step);
+      });
+
+      /* textContent, not innerHTML — data-* attributes must never be able to
+         inject markup. data-caption carries an escaped <br>, which becomes a
+         newline here and renders via `white-space: pre-line` in the CSS. */
+      if (stageCaption) {
+        stageCaption.textContent =
+          (step.getAttribute("data-caption") || "").replace(/<br\s*\/?>/gi, "\n");
+      }
+      if (stageNum) stageNum.textContent = String(index + 1).padStart(2, "0");
+      if (stageLed) {
+        stageLed.classList.toggle("is-lit", step.getAttribute("data-led") === "on");
+      }
+    };
+
+    var updateShowcase = function () {
+      showcaseTicking = false;
+
+      var box = showcase.getBoundingClientRect();
+      /* Skip all work when the section is nowhere near the viewport. */
+      if (box.bottom < 0 || box.top > window.innerHeight) return;
+
+      /* --- a) Parallax: background travels at 0.3x the content's rate --- */
+      if (showcaseBg && !prefersReducedMotion) {
+        var travelled = window.innerHeight - box.top;
+        showcaseBg.style.transform =
+          "translate3d(0," + (travelled * -0.3 * 0.12).toFixed(2) + "px,0)";
+      }
+
+      /* --- b) Active step ---------------------------------------------
+         Pick the step whose centre is nearest a fixed line 40% down the
+         viewport — roughly level with the pinned stage.
+
+         An IntersectionObserver band was the obvious approach and is wrong
+         here: these steps are tall with large gaps, so two of them can sit
+         in any band at once, and "first visible wins" then lags a step
+         behind and never reaches the last one. Nearest-to-a-line has no
+         such ambiguity and behaves identically scrolling up or down. */
+      var line = window.innerHeight * 0.4;
+      var best = null;
+      var bestDistance = Infinity;
+
+      for (var i = 0; i < steps.length; i++) {
+        var r = steps[i].getBoundingClientRect();
+        var distance = Math.abs((r.top + r.height / 2) - line);
+        if (distance < bestDistance) { bestDistance = distance; best = steps[i]; }
+      }
+      if (best) setActiveStep(best);
+    };
+
+    window.addEventListener("scroll", function () {
+      if (showcaseTicking) return;
+      showcaseTicking = true;
+      window.requestAnimationFrame(updateShowcase);
+    }, { passive: true });
+
+    window.addEventListener("resize", updateShowcase, { passive: true });
+    updateShowcase();
+  }
+
+
+  /* 4. FAQ DISCLOSURES ====================================================
+     A real <button> controlling a panel, so Enter, Space, focus and
+     screen-reader semantics all work without us implementing them. The
+     panel animates via CSS (grid-template-rows 0fr → 1fr). */
+
+  var faqButtons = [].slice.call(document.querySelectorAll(".faq-btn"));
+
+  if (faqButtons.length) {
     var closePanel = function (btn) {
       var panel = document.getElementById(btn.getAttribute("aria-controls"));
       if (!panel) return;
@@ -124,8 +214,7 @@
       btn.setAttribute("aria-expanded", "false");
       panel.classList.remove("is-open");
 
-      /* Wait for the collapse to finish before hiding, or the transition is
-         cut off. Skipped entirely when motion is reduced. */
+      /* Wait for the collapse before hiding, or the transition is cut off. */
       if (prefersReducedMotion) {
         panel.hidden = true;
       } else {
@@ -139,8 +228,8 @@
       var panel = document.getElementById(btn.getAttribute("aria-controls"));
       if (!panel) return;
 
-      /* One at a time — six open panels is a wall of text. */
-      featureButtons.forEach(function (other) {
+      /* One at a time — the whole list open at once is a wall of text. */
+      faqButtons.forEach(function (other) {
         if (other !== btn && other.getAttribute("aria-expanded") === "true") {
           closePanel(other);
         }
@@ -153,46 +242,21 @@
 
       btn.setAttribute("aria-expanded", "true");
       panel.classList.add("is-open");
-
-      /* Bring the card into view under the sticky header. */
-      btn.scrollIntoView({
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-        block: "nearest",
-      });
-
-      /* Make the open feature linkable without adding a history entry per
-         click — replaceState keeps the back button meaning "previous page". */
-      if (btn.id) history.replaceState(null, "", "#" + btn.id);
     };
 
-    featureButtons.forEach(function (btn) {
+    faqButtons.forEach(function (btn) {
       btn.addEventListener("click", function () {
-        if (btn.getAttribute("aria-expanded") === "true") {
-          closePanel(btn);
-          history.replaceState(null, "", location.pathname + location.search);
-        } else {
-          openPanel(btn);
-        }
+        if (btn.getAttribute("aria-expanded") === "true") closePanel(btn);
+        else openPanel(btn);
       });
     });
-
-    /* Deep link: /#btn-uvc opens that panel on load. */
-    if (location.hash.length > 1) {
-      var deepLinked = document.getElementById(location.hash.slice(1));
-      if (deepLinked && deepLinked.classList.contains("feature-btn")) {
-        openPanel(deepLinked);
-      }
-    }
   }
 
 
-  /* 4. WAITLIST FORM ======================================================
-     Validation lives here (the form is novalidate) so the messaging and
-     error styling are identical across browsers.
-
+  /* 5. WAITLIST FORM ======================================================
      With WAITLIST_ENDPOINT set, the address is POSTed to a Google Apps Script
-     that saves it to a Sheet and emails you. With it empty, the form behaves
-     exactly as it did before: validate, confirm, send nothing. */
+     that saves it to a Sheet and emails the owner. With it empty, the form
+     validates and confirms locally and sends nothing. */
 
   var form = document.getElementById("waitlist-form");
   var done = document.getElementById("waitlist-done");
@@ -231,8 +295,7 @@
       done.hidden = false;
     };
 
-    /* Never claim success we can't back up. If the request failed, say so and
-       give people another way through. */
+    /* Never claim a success we can't back up. */
     var failed = function () {
       setBusy(false);
       var fallback = FALLBACK_EMAIL
@@ -241,7 +304,6 @@
       showError("Something went wrong on our end — your spot wasn't saved." + fallback);
     };
 
-    /* Clear the error as soon as the person starts correcting it. */
     emailInput.addEventListener("input", function () {
       if (errorEl.textContent) clearError();
     });
@@ -259,7 +321,6 @@
         emailInput.focus();
         return;
       }
-
       if (!EMAIL_RE.test(value)) {
         showError("That doesn't look like a valid email address.");
         emailInput.focus();
@@ -269,10 +330,7 @@
       clearError();
 
       /* No endpoint configured yet — confirm locally, send nothing. */
-      if (!WAITLIST_ENDPOINT) {
-        succeed();
-        return;
-      }
+      if (!WAITLIST_ENDPOINT) { succeed(); return; }
 
       setBusy(true);
 
@@ -304,37 +362,33 @@
   }
 
 
-  /* 5. READING PROGRESS ===================================================
-     Width is set inside rAF so a fast scroll doesn't queue a layout write per
-     event. Skipped entirely under reduced motion (the CSS hides the bar too). */
+  /* 6. READING PROGRESS =================================================== */
 
   var progressBar = document.getElementById("progress-bar");
 
   if (progressBar && !prefersReducedMotion) {
-    var ticking = false;
+    var progressTicking = false;
 
     var updateProgress = function () {
+      progressTicking = false;
       var doc = document.documentElement;
       var scrollable = doc.scrollHeight - window.innerHeight;
       var pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
       progressBar.style.width = Math.min(100, Math.max(0, pct)) + "%";
-      ticking = false;
     };
 
     window.addEventListener("scroll", function () {
-      if (ticking) return;
-      ticking = true;
+      if (progressTicking) return;
+      progressTicking = true;
       window.requestAnimationFrame(updateProgress);
     }, { passive: true });
 
-    /* Panels opening and closing change the page height. */
     window.addEventListener("resize", updateProgress, { passive: true });
     updateProgress();
   }
 
 
-  /* 6. SCROLLSPY ==========================================================
-     Marks the nav link for whichever section is currently in view. */
+  /* 7. SCROLLSPY ========================================================== */
 
   var spySections = document.querySelectorAll("main section[id]");
 
@@ -344,18 +398,17 @@
       linkFor[link.getAttribute("href").slice(1)] = link;
     });
 
-    var visible = {};
+    var sectionVisible = {};
 
     var spyObserver = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          visible[entry.target.id] = entry.isIntersecting;
+          sectionVisible[entry.target.id] = entry.isIntersecting;
         });
 
-        /* Topmost visible section wins, so scrolling up and down agree. */
         var current = null;
         for (var i = 0; i < spySections.length; i++) {
-          if (visible[spySections[i].id]) { current = spySections[i].id; break; }
+          if (sectionVisible[spySections[i].id]) { current = spySections[i].id; break; }
         }
 
         Object.keys(linkFor).forEach(function (id) {
@@ -363,75 +416,17 @@
           else linkFor[id].removeAttribute("aria-current");
         });
       },
-      /* Only count a section once it's properly in the upper viewport. */
       { rootMargin: "-20% 0px -60% 0px" }
     );
 
-    spySections.forEach(function (section) {
-      spyObserver.observe(section);
-    });
-  }
-
-
-  /* 7. PRICING COUNT-UP ===================================================
-     Animates the three ledger figures once, when they scroll into view.
-
-     The final text is read straight out of the DOM and restored verbatim at
-     the end, so the animation can never show a number that disagrees with
-     what's actually written in the HTML. Only the digits are animated; any
-     surrounding characters (~, $, %, en dashes) are preserved. */
-
-  var ledgerCells = document.querySelectorAll(".ledger .num");
-
-  if (ledgerCells.length && "IntersectionObserver" in window && !prefersReducedMotion) {
-    var countUp = function (cell) {
-      var finalText = cell.textContent;
-      var numbers = finalText.match(/\d+/g);
-      if (!numbers) return;
-
-      var targets = numbers.map(Number);
-      var DURATION = 900;
-      var start = null;
-
-      var frame = function (now) {
-        if (start === null) start = now;
-        var t = Math.min(1, (now - start) / DURATION);
-        /* easeOutCubic — fast then settling, rather than a linear ramp. */
-        var eased = 1 - Math.pow(1 - t, 3);
-
-        var i = 0;
-        cell.textContent = finalText.replace(/\d+/g, function () {
-          return String(Math.round(targets[i++] * eased));
-        });
-
-        if (t < 1) window.requestAnimationFrame(frame);
-        else cell.textContent = finalText;   // exact original, always
-      };
-
-      window.requestAnimationFrame(frame);
-    };
-
-    var ledgerObserver = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          countUp(entry.target);
-          ledgerObserver.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.6 }
-    );
-
-    ledgerCells.forEach(function (cell) {
-      ledgerObserver.observe(cell);
-    });
+    spySections.forEach(function (section) { spyObserver.observe(section); });
   }
 
 
   /* 8. ANCHOR SCROLL ======================================================
-     CSS `scroll-padding-top` already keeps targets clear of the sticky
-     header for native jumps. This adds the smooth easing, and skips it
-     entirely when reduced motion is requested. */
+     CSS scroll-padding-top already keeps targets clear of the sticky header
+     for native jumps. This adds the smooth easing, skipped under reduced
+     motion. */
 
   if (!prefersReducedMotion) {
     document.querySelectorAll('a[href^="#"]').forEach(function (link) {
@@ -445,7 +440,6 @@
         event.preventDefault();
         target.scrollIntoView({ behavior: "smooth", block: "start" });
 
-        /* Keep the URL and keyboard focus in sync with where we scrolled. */
         history.pushState(null, "", id);
         target.setAttribute("tabindex", "-1");
         target.focus({ preventScroll: true });
